@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deposit Rate Board &middot; Nelnet Bank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@1,500;1,600&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --teal:#3B5759; --teal-2:#32494B; --teal-text:#3E6E76;
+    --cream:#ECEAE0; --card:#FFFFFF; --rule:#DAD7C9; --rule-2:#E7E4D8;
+    --ink:#1F2E2D; --muted:#6E7572;
+    --lime:#8CC63E; --lime-soft:#EAF4D6; --green:#5DA12E; --green-text:#3F7A24;
+    --down:#B2472E;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--cream); color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+    font-size:15px; line-height:1.45;
+  }
+  .num{font-family:'Space Grotesk',sans-serif; font-variant-numeric:tabular-nums;}
+
+  /* Masthead */
+  .masthead{position:relative; overflow:hidden; background:var(--teal);
+    background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%221400%22%20height%3D%22300%22%20viewBox%3D%220%200%201400%20300%22%3E%3Cpolyline%20points%3D%22275.8%2C150.0%20275.5%2C152.7%20274.8%2C155.4%20273.7%2C158.1%20271.9%2C160.6%20269.4%2C163.0%20266.2%2C164.9%20262.4%2C166.3%20258.3%2C167.0%20254.1%2C167.3%20250.0%2C167.1%20246.1%2C166.6%20242.2%2C165.9%20238.5%2C165.1%20234.6%2C164.1%20230.7%2C162.8%20227.0%2C161.1%20223.8%2C158.9%20221.3%2C156.2%20220.0%2C153.2%20220.0%2C150.0%20221.3%2C147.0%20223.6%2C144.3%20226.6%2C142.1%20229.9%2C140.3%20233.2%2C138.8%20236.3%2C137.4%20239.4%2C136.1%20242.6%2C134.7%20246.0%2C133.4%20250.0%2C132.2%20254.4%2C131.6%20259.0%2C131.6%20263.5%2C132.3%20267.6%2C133.9%20270.8%2C136.1%20273.2%2C138.7%20274.7%2C141.6%20275.5%2C144.5%20275.8%2C147.3%20275.8%2C150.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%22298.5%2C150.0%20297.9%2C155.1%20297.1%2C160.2%20295.6%2C165.5%20292.9%2C170.8%20288.7%2C175.8%20282.9%2C180.2%20275.6%2C183.5%20267.3%2C185.6%20258.7%2C186.4%20250.0%2C186.2%20241.7%2C185.1%20233.7%2C183.5%20226.0%2C181.4%20218.5%2C178.9%20211.3%2C175.8%20204.6%2C172.0%20199.0%2C167.3%20194.9%2C161.9%20192.9%2C156.0%20193.2%2C150.0%20195.6%2C144.3%20199.8%2C139.1%20205.0%2C134.7%20210.8%2C131.0%20216.5%2C127.7%20222.2%2C124.5%20228.0%2C121.2%20234.4%2C117.9%20241.6%2C114.8%20250.0%2C112.4%20259.2%2C111.1%20268.8%2C111.4%20277.9%2C113.5%20285.8%2C117.2%20291.8%2C122.1%20295.9%2C127.8%20298.0%2C133.7%20298.8%2C139.4%20298.8%2C144.8%20298.5%2C150.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%22319.9%2C150.0%20320.4%2C157.4%20320.6%2C165.3%20319.7%2C173.7%20316.6%2C182.2%20310.7%2C190.5%20301.9%2C197.6%20290.5%2C203.0%20277.4%2C206.2%20263.6%2C207.2%20250.0%2C206.2%20237.2%2C203.7%20225.5%2C200.3%20214.6%2C196.3%20204.4%2C191.9%20194.6%2C186.9%20185.5%2C181.2%20177.6%2C174.6%20171.6%2C167.0%20168.1%2C158.7%20167.5%2C150.0%20169.9%2C141.5%20174.7%2C133.7%20181.3%2C126.7%20189.0%2C120.4%20197.1%2C114.8%20205.7%2C109.3%20214.9%2C104.1%20225.2%2C99.1%20236.9%2C94.8%20250.0%2C91.8%20264.1%2C90.7%20278.2%2C92.1%20291.2%2C96.0%20302.1%2C102.2%20310.1%2C109.9%20315.2%2C118.4%20317.9%2C126.9%20319.0%2C135.1%20319.5%2C142.7%20319.9%2C150.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%22345.4%2C150.0%20347.7%2C160.3%20349.1%2C171.5%20348.2%2C183.4%20343.8%2C195.4%20335.1%2C206.7%20322.1%2C216.1%20305.6%2C222.7%20287.0%2C226.0%20268.1%2C226.0%20250.0%2C223.4%20233.6%2C219.0%20218.9%2C213.7%20205.5%2C208.2%20192.8%2C202.5%20180.3%2C196.5%20168.0%2C189.7%20156.5%2C181.8%20147.0%2C172.3%20140.5%2C161.6%20137.9%2C150.0%20139.4%2C138.3%20144.7%2C127.2%20153.1%2C117.1%20163.6%2C108.2%20175.4%2C100.3%20188.1%2C93.2%20201.6%2C86.7%20216.4%2C81.0%20232.5%2C76.5%20250.0%2C73.8%20268.2%2C73.5%20286.0%2C76.1%20302.3%2C81.6%20315.8%2C89.6%20326.1%2C99.3%20333.0%2C109.8%20337.5%2C120.3%20340.4%2C130.4%20342.9%2C140.2%20345.4%2C150.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%22376.8%2C150.0%20379.8%2C163.7%20380.6%2C178.3%20377.9%2C193.5%20370.4%2C208.3%20357.5%2C221.7%20339.6%2C232.2%20318.0%2C239.0%20294.7%2C241.7%20271.5%2C240.6%20250.0%2C236.7%20230.7%2C231.2%20213.4%2C225.2%20197.1%2C219.3%20180.8%2C213.5%20164.0%2C207.4%20146.8%2C200.0%20130.4%2C190.6%20116.3%2C179.0%20106.5%2C165.2%20102.2%2C150.0%20104.1%2C134.6%20111.6%2C120.0%20123.7%2C107.1%20138.9%2C96.2%20155.6%2C87.1%20173.1%2C79.4%20191.0%2C72.8%20209.6%2C67.1%20229.2%2C62.6%20250.0%2C59.8%20271.5%2C59.5%20292.8%2C62.1%20312.7%2C68.0%20330.0%2C76.6%20343.9%2C87.4%20354.4%2C99.4%20362.1%2C111.9%20368.0%2C124.4%20372.7%2C137.0%20376.8%2C150.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%22408.8%2C150.0%20409.9%2C166.9%20408.1%2C184.3%20402.2%2C201.7%20391.0%2C218.3%20374.3%2C232.9%20352.6%2C244.2%20327.5%2C251.4%20300.8%2C254.2%20274.5%2C253.3%20250.0%2C249.7%20227.5%2C244.7%20206.5%2C239.3%20185.8%2C234.0%20164.5%2C228.5%20142.1%2C221.9%20119.4%2C213.2%2098.2%2C201.6%2080.8%2C186.6%2069.6%2C169.0%2066.1%2C150.0%2070.7%2C131.1%2082.6%2C113.7%2099.8%2C99.0%20120.1%2C87.1%20141.4%2C77.6%20162.6%2C69.8%20183.4%2C62.8%20204.4%2C56.3%20226.4%2C50.5%20250.0%2C46.1%20275.2%2C44.1%20300.9%2C45.5%20325.9%2C50.7%20348.5%2C59.6%20367.4%2C71.8%20382.0%2C86.0%20392.8%2C101.5%20400.3%2C117.4%20405.5%2C133.6%20408.8%2C150.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%22432.9%2C150.0%20431.1%2C169.1%20426.8%2C188.3%20418.7%2C207.3%20405.8%2C225.5%20387.5%2C241.7%20364.2%2C254.8%20337.1%2C264.0%20307.9%2C268.8%20278.5%2C269.8%20250.0%2C267.9%20222.9%2C264.1%20196.7%2C259.3%20170.6%2C253.9%20143.8%2C247.4%20116.6%2C238.9%2090.1%2C227.5%2066.5%2C212.3%2048.5%2C193.6%2038.5%2C172.3%2037.8%2C150.0%2046.3%2C128.5%2062.4%2C109.4%2083.7%2C93.5%20107.2%2C80.8%20130.8%2C70.5%20153.5%2C61.4%20175.5%2C52.6%20198.1%2C43.5%20222.6%2C34.7%20250.0%2C27.3%20280.2%2C22.9%20312.0%2C22.9%20343.1%2C28.2%20371.2%2C38.7%20394.4%2C53.7%20411.6%2C71.7%20423.0%2C91.2%20429.5%2C111.1%20432.4%2C130.7%20432.9%2C150.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%22447.3%2C150.0%20444.8%2C170.6%20440.6%2C191.3%20433.6%2C212.4%20421.8%2C233.2%20404.1%2C252.8%20380.3%2C269.5%20351.1%2C282.3%20318.3%2C290.2%20284.1%2C293.4%20250.0%2C292.5%20217.1%2C288.6%20185.4%2C282.5%20154.5%2C274.9%20124.1%2C265.5%2094.5%2C253.7%2066.8%2C238.7%2043.3%2C220.2%2026.3%2C198.5%2017.9%2C174.5%2019.1%2C150.0%2029.5%2C126.7%2047.0%2C106.0%2069.1%2C88.6%2093.0%2C73.9%20116.8%2C61.2%20140.0%2C49.1%20163.4%2C36.7%20188.5%2C23.9%20217.2%2C11.8%20250.0%2C2.0%20286.5%2C-3.5%20324.5%2C-2.9%20361.1%2C4.6%20393.1%2C18.7%20418.1%2C37.9%20435.1%2C60.3%20444.7%2C83.9%20448.6%2C107.0%20448.9%2C129.0%20447.3%2C150.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%22787.3%2C90.0%20787.5%2C92.9%20786.9%2C95.8%20785.3%2C98.6%20782.8%2C101.0%20779.5%2C103.0%20775.6%2C104.4%20771.6%2C105.2%20767.6%2C105.7%20763.8%2C105.9%20760.0%2C106.0%20756.2%2C106.1%20752.1%2C106.1%20747.9%2C105.9%20743.5%2C105.2%20739.2%2C103.9%20735.4%2C101.9%20732.6%2C99.3%20731.0%2C96.3%20730.7%2C93.1%20731.6%2C90.0%20733.4%2C87.2%20735.7%2C84.7%20738.2%2C82.6%20740.7%2C80.7%20743.2%2C78.8%20745.7%2C76.9%20748.6%2C75.1%20751.9%2C73.4%20755.7%2C72.0%20760.0%2C71.2%20764.5%2C71.1%20768.9%2C71.8%20772.9%2C73.1%20776.4%2C74.9%20779.3%2C77.1%20781.6%2C79.5%20783.6%2C82.0%20785.2%2C84.5%20786.5%2C87.2%20787.3%2C90.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%22811.5%2C90.0%20812.0%2C95.5%20811.2%2C101.1%20808.8%2C106.6%20804.6%2C111.6%20798.8%2C115.8%20791.7%2C119.1%20784.0%2C121.4%20776.0%2C122.9%20768.0%2C123.7%20760.0%2C124.1%20751.9%2C124.2%20743.5%2C123.9%20734.8%2C122.9%20726.2%2C121.0%20718.2%2C117.9%20711.5%2C113.5%20706.6%2C108.1%20704.2%2C102.1%20704.2%2C95.9%20706.2%2C90.0%20709.7%2C84.7%20713.9%2C80.0%20718.2%2C75.8%20722.4%2C71.8%20726.6%2C67.7%20731.1%2C63.4%20736.4%2C59.1%20743.0%2C55.2%20751.0%2C52.1%20760.0%2C50.3%20769.5%2C50.2%20778.6%2C51.8%20786.8%2C55.0%20793.5%2C59.3%20798.7%2C64.2%20802.7%2C69.3%20805.7%2C74.5%20808.1%2C79.6%20810.1%2C84.7%20811.5%2C90.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%22834.5%2C90.0%20836.6%2C98.1%20836.8%2C106.6%20834.4%2C115.3%20829.0%2C123.4%20820.8%2C130.5%20810.2%2C136.1%20798.1%2C139.9%20785.4%2C142.1%20772.6%2C143.0%20760.0%2C143.0%20747.6%2C142.3%20735.2%2C140.9%20722.9%2C138.5%20710.9%2C135.0%20700.0%2C130.0%20690.8%2C123.5%20684.1%2C115.8%20680.5%2C107.2%20680.0%2C98.4%20682.1%2C90.0%20686.0%2C82.2%20690.9%2C75.0%20696.1%2C68.3%20701.4%2C61.6%20707.2%2C54.8%20714.0%2C47.8%20722.5%2C41.0%20733.2%2C35.0%20745.9%2C30.6%20760.0%2C28.6%20774.4%2C29.3%20787.9%2C32.7%20799.5%2C38.3%20808.7%2C45.3%20815.5%2C53.0%20820.5%2C60.7%20824.4%2C68.1%20828.0%2C75.3%20831.4%2C82.5%20834.5%2C90.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%22861.5%2C90.0%20865.9%2C101.2%20867.3%2C113.3%20864.6%2C125.5%20857.1%2C137.0%20845.1%2C146.8%20829.8%2C154.0%20812.4%2C158.5%20794.4%2C160.5%20776.8%2C160.5%20760.0%2C159.3%20744.0%2C157.2%20728.5%2C154.6%20713.2%2C151.2%20698.2%2C146.7%20684.1%2C140.6%20671.6%2C132.8%20661.9%2C123.3%20655.6%2C112.6%20653.1%2C101.3%20654.0%2C90.0%20657.6%2C79.2%20663.0%2C69.0%20669.5%2C59.3%20676.9%2C49.7%20685.5%2C40.3%20695.8%2C31.1%20708.5%2C22.6%20723.7%2C15.6%20741.2%2C11.0%20760.0%2C9.6%20778.6%2C11.7%20795.6%2C16.9%20810.0%2C24.6%20821.3%2C33.8%20829.9%2C43.4%20836.7%2C52.9%20842.8%2C61.9%20849.0%2C70.7%20855.5%2C79.9%20861.5%2C90.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%22894.5%2C90.0%20900.0%2C104.8%20900.9%2C120.5%20895.9%2C136.2%20884.5%2C150.3%20867.6%2C161.7%20846.8%2C169.6%20824.1%2C173.8%20801.4%2C174.9%20779.9%2C173.8%20760.0%2C171.5%20741.3%2C168.9%20722.9%2C166.2%20704.2%2C163.0%20685.1%2C158.7%20666.2%2C152.5%20648.9%2C143.8%20634.5%2C132.6%20624.6%2C119.3%20619.7%2C104.8%20619.9%2C90.0%20624.3%2C75.7%20631.9%2C62.3%20641.7%2C49.8%20653.0%2C38.2%20665.7%2C27.1%20680.2%2C16.8%20697.0%2C7.6%20716.3%2C0.3%20737.6%2C-4.3%20760.0%2C-5.4%20782.1%2C-2.8%20802.3%2C3.1%20819.8%2C11.7%20834.3%2C21.8%20846.2%2C32.6%20856.5%2C43.3%20866.3%2C53.9%20876.2%2C64.8%20886.0%2C76.7%20894.5%2C90.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%22927.9%2C90.0%20932.2%2C108.2%20930.5%2C126.9%20921.7%2C144.9%20906.0%2C160.7%20884.4%2C172.9%20859.2%2C181.0%20832.7%2C185.1%20806.8%2C186.0%20782.6%2C185.1%20760.0%2C183.4%20738.2%2C181.9%20715.9%2C180.5%20692.4%2C178.5%20667.6%2C174.8%20642.8%2C168.1%20619.9%2C157.8%20601.2%2C143.9%20588.7%2C127.1%20583.5%2C108.6%20585.3%2C90.0%20593.0%2C72.4%20605.0%2C56.4%20619.3%2C42.2%20635.0%2C29.4%20651.5%2C17.7%20669.1%2C6.6%20688.6%2C-3.4%20710.4%2C-11.9%20734.4%2C-17.7%20760.0%2C-20.1%20785.8%2C-18.6%20810.4%2C-13.3%20832.5%2C-4.8%20851.6%2C5.9%20868.1%2C17.9%20882.5%2C30.7%20895.8%2C43.9%20908.2%2C57.9%20919.3%2C73.2%20927.9%2C90.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%22953.6%2C90.0%20955.5%2C110.6%20951.2%2C131.4%20939.8%2C151.1%20921.5%2C168.2%20897.7%2C181.8%20870.2%2C191.2%20841.5%2C196.7%20813.3%2C199.3%20786.2%2C200.2%20760.0%2C200.6%20733.7%2C200.9%20706.0%2C200.8%20676.6%2C199.2%20645.9%2C194.7%20615.8%2C186.1%20589.0%2C172.8%20568.4%2C155.1%20556.1%2C134.2%20553.0%2C111.9%20558.5%2C90.0%20570.6%2C70.0%20586.8%2C52.5%20604.8%2C37.3%20622.9%2C23.6%20640.9%2C10.6%20659.5%2C-2.2%20680.0%2C-14.7%20703.4%2C-26.1%20730.3%2C-35.0%20760.0%2C-40.0%20791.0%2C-40.4%20821.3%2C-35.7%20849.1%2C-26.5%20873.3%2C-13.9%20893.6%2C0.9%20910.5%2C17.1%20924.9%2C34.0%20937.0%2C51.6%20946.9%2C70.3%20953.6%2C90.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%22969.6%2C90.0%20971.1%2C112.3%20967.1%2C134.9%20956.3%2C156.7%20938.4%2C176.4%20914.3%2C192.8%20885.7%2C205.3%20854.7%2C213.9%20823.0%2C219.3%20791.4%2C222.4%20760.0%2C224.1%20728.0%2C224.9%20694.6%2C224.2%20659.9%2C220.9%20625.0%2C213.8%20592.1%2C201.9%20564.2%2C184.9%20544.0%2C163.4%20533.5%2C139.1%20533.1%2C114.0%20541.4%2C90.0%20555.8%2C68.4%20573.5%2C49.6%20591.8%2C32.9%20609.6%2C17.1%20626.9%2C1.3%20645.4%2C-15.1%20667.0%2C-31.7%20693.2%2C-47.0%20724.5%2C-59.2%20760.0%2C-66.4%20797.3%2C-67.2%20833.7%2C-61.2%20866.5%2C-49.3%20894.0%2C-32.9%20915.7%2C-13.8%20932.4%2C6.5%20945.4%2C27.0%20955.8%2C47.6%20964.0%2C68.5%20969.6%2C90.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%221178.3%2C210.0%201178.4%2C213.0%201177.4%2C215.9%201175.5%2C218.6%201172.6%2C220.9%201169.0%2C222.7%201165.1%2C223.9%201161.2%2C224.7%201157.4%2C225.2%201153.7%2C225.6%201150.0%2C226.0%201146.1%2C226.4%201141.9%2C226.6%201137.5%2C226.4%201132.9%2C225.7%201128.7%2C224.2%201125.2%2C222.0%201122.7%2C219.3%201121.5%2C216.2%201121.5%2C213.0%201122.5%2C210.0%201124.2%2C207.3%201126.3%2C204.9%201128.4%2C202.7%201130.5%2C200.6%201132.7%2C198.5%201135.2%2C196.4%201138.2%2C194.5%201141.6%2C192.9%201145.6%2C191.7%201150.0%2C191.2%201154.4%2C191.4%201158.7%2C192.2%201162.5%2C193.6%201165.9%2C195.4%201168.8%2C197.5%201171.4%2C199.6%201173.7%2C202.0%201175.7%2C204.4%201177.3%2C207.1%201178.3%2C210.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%221203.4%2C210.0%201203.7%2C215.7%201202.4%2C221.3%201199.1%2C226.7%201194.2%2C231.4%201187.8%2C235.2%201180.7%2C238.2%201173.1%2C240.3%201165.5%2C241.9%201157.9%2C243.1%201150.0%2C244.1%201141.7%2C244.7%201133.0%2C244.8%201124.0%2C244.0%201115.2%2C242.0%201107.2%2C238.5%201100.9%2C233.8%201096.8%2C228.1%201095.2%2C221.9%201095.8%2C215.7%201098.1%2C210.0%201101.4%2C204.9%201105.0%2C200.3%201108.6%2C195.9%201112.0%2C191.6%201115.6%2C187.1%201120.0%2C182.5%201125.6%2C178.0%201132.5%2C174.2%201140.8%2C171.5%201150.0%2C170.3%201159.3%2C170.7%201168.1%2C172.8%201175.9%2C176.1%201182.4%2C180.2%201187.8%2C184.8%201192.2%2C189.6%201195.9%2C194.4%201199.1%2C199.4%201201.7%2C204.5%201203.4%2C210.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%221227.3%2C210.0%201229.1%2C218.4%201228.5%2C227.0%201224.9%2C235.5%201218.4%2C243.1%201209.4%2C249.6%201198.6%2C254.6%201186.8%2C258.2%201174.7%2C260.6%201162.4%2C262.1%201150.0%2C263.0%201137.4%2C263.1%201124.5%2C262.3%201111.6%2C260.2%201099.3%2C256.5%201088.5%2C251.0%201080.0%2C243.9%201074.4%2C235.7%201072.0%2C226.9%201072.5%2C218.2%201075.0%2C210.0%201078.6%2C202.5%201082.6%2C195.4%201086.6%2C188.5%201090.8%2C181.3%201095.8%2C173.9%201102.4%2C166.3%201111.2%2C159.3%201122.4%2C153.5%201135.7%2C149.7%201150.0%2C148.5%201164.2%2C150.1%201177.2%2C154.1%201188.3%2C160.0%201197.1%2C166.8%201204.0%2C174.0%201209.7%2C181.1%201214.7%2C188.0%201219.4%2C195.0%201223.8%2C202.2%201227.3%2C210.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%221255.3%2C210.0%201259.3%2C221.5%201259.6%2C233.7%201255.2%2C245.7%201246.3%2C256.6%201233.3%2C265.6%201217.7%2C272.1%201200.7%2C276.3%201183.4%2C278.5%201166.5%2C279.3%201150.0%2C279.2%201133.8%2C278.2%201117.6%2C276.4%201101.6%2C273.4%201086.1%2C268.6%201072.1%2C261.9%201060.5%2C253.3%201052.3%2C243.2%201047.6%2C232.2%201046.3%2C220.9%201047.8%2C210.0%201051.0%2C199.5%201055.2%2C189.5%201060.2%2C179.5%201066.1%2C169.3%201073.7%2C159.1%201083.7%2C149.2%201096.8%2C140.3%201112.8%2C133.6%201130.9%2C129.8%201150.0%2C129.5%201168.4%2C132.7%201184.7%2C138.8%201198.3%2C146.8%201209.1%2C155.8%201217.9%2C164.7%201225.6%2C173.4%201233.2%2C181.7%201241.0%2C190.3%201248.7%2C199.6%201255.3%2C210.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%221289.2%2C210.0%201294.3%2C225.2%201293.7%2C241.1%201286.7%2C256.4%201273.5%2C269.8%201255.3%2C280.2%201234.1%2C287.2%201211.9%2C291.0%201190.1%2C292.4%201169.5%2C292.2%201150.0%2C291.4%201130.9%2C290.2%201111.7%2C288.5%201092.1%2C285.8%201072.4%2C281.2%201053.8%2C274.2%201037.5%2C264.5%201025.0%2C252.5%201017.1%2C238.8%201013.8%2C224.4%201014.6%2C210.0%201018.6%2C196.1%201024.7%2C182.9%201032.5%2C170.1%201041.9%2C157.7%201053.4%2C145.6%201067.6%2C134.4%201084.9%2C124.8%201105.0%2C117.8%201127.2%2C114.2%201150.0%2C114.4%201171.7%2C118.5%201191.2%2C125.5%201207.7%2C134.5%201221.6%2C144.3%201233.7%2C154.2%201245.2%2C163.9%201256.8%2C173.7%201268.7%2C184.3%201280.0%2C196.3%201289.2%2C210.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%221323.6%2C210.0%201327.3%2C228.7%201323.9%2C247.7%201312.7%2C265.3%201294.7%2C280.1%201271.7%2C291.1%201246.1%2C298.2%201220.1%2C301.8%201195.3%2C303.0%201172.1%2C303.2%201150.0%2C303.3%201127.8%2C303.5%201104.5%2C303.3%201079.8%2C301.8%201054.4%2C297.7%201029.8%2C290.1%201008.3%2C278.6%20991.8%2C263.7%20981.7%2C246.5%20978.3%2C228.1%20981.0%2C210.0%20988.1%2C192.9%20998.3%2C177.1%201010.4%2C162.6%201023.8%2C148.9%201038.8%2C135.8%201056.0%2C123.7%201076.0%2C113.2%201098.9%2C105.1%201124.0%2C100.5%201150.0%2C99.7%201175.4%2C102.9%201199.0%2C109.5%201219.9%2C118.5%201238.4%2C128.9%201255.1%2C139.9%201270.9%2C151.4%201286.4%2C163.7%201301.2%2C177.2%201314.2%2C192.7%201323.6%2C210.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%221350.2%2C210.0%201351.4%2C231.3%201345.1%2C252.3%201331.0%2C271.5%201310.1%2C287.5%201284.5%2C299.7%201256.6%2C307.8%201228.5%2C312.8%201201.5%2C315.8%201175.7%2C318.1%201150.0%2C320.4%201123.2%2C322.7%201094.4%2C324.0%201063.6%2C323.0%201032.1%2C318.2%201002.3%2C308.5%20977.1%2C293.7%20959.0%2C274.9%20949.5%2C253.4%20948.7%2C231.3%20955.1%2C210.0%20966.6%2C190.6%20980.8%2C173.3%20996.0%2C157.7%201011.5%2C142.9%201027.7%2C128.5%201045.8%2C114.4%201067.0%2C101.4%201091.7%2C90.4%201119.8%2C82.9%201150.0%2C79.8%201180.5%2C81.5%201209.7%2C87.6%201236.1%2C97.3%201259.5%2C109.5%201280.1%2C123.2%201298.7%2C138.0%201315.5%2C153.8%201330.5%2C170.9%201342.6%2C189.7%201350.2%2C210.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%221367.2%2C210.0%201368.0%2C233.0%201361.6%2C255.8%201347.6%2C277.1%201326.7%2C295.6%201300.7%2C310.4%201271.5%2C321.5%201241.3%2C329.4%201211.0%2C335.2%201180.9%2C339.9%201150.0%2C343.9%201117.5%2C346.9%201082.8%2C347.9%201046.6%2C345.3%201010.7%2C337.8%20978.2%2C324.6%20952.0%2C305.9%20934.7%2C283.1%20927.5%2C258.2%20929.6%2C233.3%20938.9%2C210.0%20952.7%2C189.2%20968.0%2C170.6%20983.2%2C153.3%20997.9%2C136.3%201013.3%2C118.9%201031.3%2C101.0%201053.6%2C83.8%201081.3%2C69.0%201114.0%2C58.3%201150.0%2C53.4%201186.8%2C54.9%201221.9%2C62.5%201253.1%2C75.1%201279.7%2C91.0%201301.8%2C108.8%201320.3%2C127.5%201336.2%2C146.8%201349.8%2C166.7%201360.5%2C187.8%201367.2%2C210.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%22545.7%2C280.0%20545.2%2C282.7%20544.5%2C285.3%20543.4%2C287.9%20541.7%2C290.5%20539.3%2C292.9%20536.2%2C294.8%20532.5%2C296.3%20528.4%2C297.2%20524.2%2C297.5%20520.0%2C297.3%20516.0%2C296.8%20512.2%2C296.0%20508.5%2C295.1%20504.7%2C294.0%20501.0%2C292.7%20497.3%2C291.0%20494.1%2C288.8%20491.6%2C286.2%20490.1%2C283.2%20490.0%2C280.0%20491.1%2C276.9%20493.3%2C274.2%20496.3%2C271.9%20499.6%2C270.1%20503.0%2C268.7%20506.3%2C267.4%20509.4%2C266.2%20512.6%2C264.9%20516.1%2C263.6%20520.0%2C262.5%20524.3%2C261.8%20528.9%2C261.7%20533.5%2C262.3%20537.7%2C263.8%20541.1%2C266.0%20543.5%2C268.6%20545.1%2C271.5%20545.8%2C274.4%20545.9%2C277.3%20545.7%2C280.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%22568.3%2C280.0%20567.5%2C285.0%20566.5%2C290.1%20564.9%2C295.3%20562.4%2C300.5%20558.4%2C305.6%20552.8%2C310.1%20545.7%2C313.6%20537.5%2C315.9%20528.8%2C316.9%20520.0%2C316.7%20511.6%2C315.5%20503.6%2C313.7%20496.0%2C311.4%20488.7%2C308.7%20481.7%2C305.5%20475.2%2C301.7%20469.6%2C297.1%20465.4%2C291.8%20463.1%2C286.0%20463.0%2C280.0%20465.2%2C274.2%20469.1%2C269.0%20474.4%2C264.5%20480.2%2C260.7%20486.2%2C257.5%20492.1%2C254.4%20498.1%2C251.4%20504.5%2C248.3%20511.8%2C245.3%20520.0%2C242.9%20529.1%2C241.5%20538.7%2C241.7%20547.9%2C243.5%20556.0%2C247.0%20562.3%2C251.8%20566.5%2C257.5%20568.7%2C263.5%20569.3%2C269.3%20569.0%2C274.8%20568.3%2C280.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%22589.7%2C280.0%20589.8%2C287.4%20589.7%2C295.1%20588.6%2C303.3%20585.7%2C311.8%20580.2%2C320.2%20571.8%2C327.5%20560.7%2C333.2%20547.6%2C336.7%20533.8%2C337.9%20520.0%2C336.9%20507.1%2C334.3%20495.3%2C330.6%20484.6%2C326.3%20474.7%2C321.6%20465.3%2C316.5%20456.4%2C310.8%20448.6%2C304.3%20442.3%2C296.8%20438.4%2C288.6%20437.3%2C280.0%20439.2%2C271.5%20443.8%2C263.5%20450.3%2C256.3%20458.1%2C250.0%20466.7%2C244.4%20475.6%2C239.3%20485.1%2C234.3%20495.4%2C229.6%20507.0%2C225.5%20520.0%2C222.5%20533.9%2C221.3%20548.1%2C222.4%20561.2%2C226.0%20572.4%2C231.9%20580.8%2C239.5%20586.1%2C248.0%20588.9%2C256.6%20589.8%2C264.9%20589.8%2C272.6%20589.7%2C280.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%22615.1%2C280.0%20616.9%2C290.2%20617.8%2C301.2%20616.8%2C312.9%20612.7%2C324.9%20604.4%2C336.3%20591.9%2C346.0%20575.8%2C353.0%20557.4%2C356.7%20538.3%2C357.0%20520.0%2C354.4%20503.4%2C349.9%20488.7%2C344.2%20475.5%2C338.2%20463.2%2C332.1%20451.1%2C325.9%20439.2%2C319.1%20427.8%2C311.3%20418.0%2C302.1%20411.0%2C291.5%20407.6%2C280.0%20408.5%2C268.2%20413.4%2C256.9%20421.8%2C246.6%20432.5%2C237.6%20444.8%2C229.8%20457.9%2C223.0%20471.9%2C217.0%20486.7%2C211.7%20502.8%2C207.5%20520.0%2C204.8%20538.0%2C204.3%20555.8%2C206.5%20572.3%2C211.6%20586.2%2C219.2%20596.9%2C228.7%20604.3%2C239.2%20608.8%2C249.8%20611.5%2C260.2%20613.4%2C270.1%20615.1%2C280.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%22646.5%2C280.0%20648.7%2C293.6%20649.0%2C307.9%20646.2%2C322.9%20639.0%2C337.6%20626.7%2C351.1%20609.4%2C362.1%20588.3%2C369.4%20565.1%2C372.6%20541.8%2C371.8%20520.0%2C368.0%20500.5%2C362.2%20483.1%2C355.7%20467.1%2C349.3%20451.3%2C343.0%20435.1%2C336.6%20418.3%2C329.2%20402.0%2C320.1%20387.6%2C308.7%20377.1%2C295.1%20371.9%2C280.0%20373.0%2C264.5%20380.0%2C249.7%20392.0%2C236.5%20407.5%2C225.5%20424.8%2C216.5%20442.9%2C209.2%20461.3%2C203.1%20480.0%2C197.9%20499.5%2C193.8%20520.0%2C191.1%20541.3%2C190.5%20562.6%2C192.7%20582.7%2C198.0%20600.5%2C206.1%20615.0%2C216.7%20626.0%2C228.7%20633.8%2C241.4%20639.2%2C254.2%20643.3%2C267.0%20646.5%2C280.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%22678.4%2C280.0%20678.6%2C296.7%20676.2%2C313.8%20670.1%2C331.0%20659.4%2C347.5%20643.4%2C362.2%20622.4%2C374.0%20597.8%2C381.8%20571.3%2C385.3%20544.9%2C384.7%20520.0%2C381.2%20497.2%2C375.9%20476.2%2C370.0%20455.8%2C364.0%20435.1%2C357.9%20413.4%2C351.1%20391.3%2C342.4%20370.2%2C330.9%20352.4%2C316.3%20340.3%2C299.0%20335.7%2C280.0%20339.4%2C260.9%20350.7%2C243.3%20367.8%2C228.3%20388.4%2C216.3%20410.4%2C206.9%20432.3%2C199.6%20453.7%2C193.2%20474.9%2C187.4%20496.7%2C182.0%20520.0%2C177.6%20544.9%2C175.4%20570.6%2C176.1%20595.9%2C180.7%20619.1%2C189.1%20638.7%2C200.9%20653.9%2C215.2%20664.7%2C230.8%20671.8%2C247.1%20676.2%2C263.5%20678.4%2C280.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%22702.5%2C280.0%20699.6%2C299.0%20694.5%2C317.8%20686.3%2C336.5%20673.9%2C354.5%20656.4%2C370.9%20634.0%2C384.6%20607.5%2C394.5%20578.5%2C400.0%20548.9%2C401.5%20520.0%2C399.6%20492.6%2C395.5%20466.3%2C390.1%20440.6%2C383.9%20414.5%2C376.8%20388.1%2C367.9%20362.2%2C356.4%20338.8%2C341.6%20320.3%2C323.3%20309.3%2C302.2%20307.4%2C280.0%20314.7%2C258.3%20330.2%2C238.9%20351.3%2C222.7%20375.2%2C209.9%20399.7%2C199.8%20423.2%2C191.2%20445.9%2C183.1%20468.7%2C174.7%20493.0%2C166.3%20520.0%2C159.0%20549.9%2C154.3%20581.6%2C153.7%20613.1%2C158.2%20642.0%2C168.1%20666.0%2C182.7%20683.8%2C200.7%20695.3%2C220.5%20701.3%2C240.7%20703.3%2C260.7%20702.5%2C280.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3Cpolyline%20points%3D%22716.9%2C280.0%20713.0%2C300.4%20708.1%2C320.7%20700.8%2C341.4%20689.6%2C362.1%20672.9%2C381.9%20650.0%2C399.3%20621.5%2C412.8%20589.0%2C421.6%20554.5%2C425.3%20520.0%2C424.5%20486.7%2C420.2%20455.0%2C413.4%20424.5%2C404.9%20395.0%2C394.7%20366.2%2C382.5%20339.3%2C367.5%20315.9%2C349.3%20298.3%2C328.0%20288.8%2C304.4%20288.6%2C280.0%20297.7%2C256.5%20314.4%2C235.5%20336.4%2C217.6%20360.8%2C202.9%20385.5%2C190.4%20409.7%2C178.8%20433.8%2C167.2%20459.2%2C155.3%20487.6%2C143.7%20520.0%2C134.0%20556.1%2C128.2%20594.1%2C128.0%20631.1%2C134.7%20663.9%2C148.0%20689.8%2C166.8%20707.6%2C189.1%20717.3%2C213.0%20720.6%2C236.5%20719.8%2C258.9%20716.9%2C280.0%22%20fill%3D%22none%22%20stroke%3D%22%235C7B7C%22%20stroke-width%3D%221%22%20stroke-opacity%3D%220.30%22/%3E%3C/svg%3E");
+    background-size:cover; background-position:center; color:#F2F4EC;
+    padding:26px 30px; display:flex; align-items:flex-end; justify-content:space-between; gap:20px; flex-wrap:wrap;}
+  .masthead::after{content:""; position:absolute; left:0; right:0; bottom:0; height:5px;
+    background:linear-gradient(90deg,var(--lime) 0%,var(--green) 100%);}
+  .brand{display:flex; flex-direction:column; gap:6px; position:relative; z-index:1;}
+  .logo{display:inline-flex; align-items:center; gap:9px; font-family:'Space Grotesk',sans-serif;
+    font-weight:700; font-size:19px; letter-spacing:-.02em; color:#fff;}
+  .logo .ring{width:26px; height:26px; border-radius:50%; border:2.5px solid var(--lime);
+    display:inline-flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; color:#fff; line-height:1;}
+  .brand h1{font-family:'Spectral',Georgia,serif; font-style:italic; font-weight:600; font-size:34px;
+    letter-spacing:0; margin:0; line-height:1; color:#fff;}
+  .brand h1 .mk{font-family:'Space Grotesk',sans-serif; font-style:normal; color:var(--lime); margin-left:8px; font-weight:700;}
+  .brand .eyebrow{font-family:'Space Grotesk',sans-serif; font-size:11px; letter-spacing:.24em;
+    text-transform:uppercase; color:#A9C6B4;}
+  .asof{text-align:right; position:relative; z-index:1;}
+  .asof .lab{font-family:'Space Grotesk',sans-serif; font-size:10.5px; letter-spacing:.2em; text-transform:uppercase; color:#A9C6B4;}
+  .asof .val{font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:600; color:#fff; margin-top:3px;}
+
+  .wrap{max-width:1080px; margin:0 auto; padding:0 24px 64px;}
+
+  /* Tabs */
+  .tabs{display:flex; gap:4px; margin:24px 0 4px; border-bottom:2px solid var(--rule); flex-wrap:wrap;}
+  .tab{appearance:none; border:0; background:none; cursor:pointer; font-family:'Space Grotesk',sans-serif;
+    font-weight:600; font-size:14.5px; color:var(--muted); padding:11px 16px 12px; position:relative;}
+  .tab:hover{color:var(--teal-text);}
+  .tab[aria-selected="true"]{color:var(--teal);}
+  .tab[aria-selected="true"]::after{content:""; position:absolute; left:8px; right:8px; bottom:-2px;
+    height:3px; background:var(--lime); border-radius:2px;}
+  .tab:focus-visible{outline:2px solid var(--green); outline-offset:2px; border-radius:3px;}
+
+  /* Leaderboard */
+  .board{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:24px 0 8px;}
+  .lead{background:var(--card); border:1px solid var(--rule); border-radius:16px; padding:17px 19px;
+    position:relative; overflow:hidden;}
+  .lead::before{content:""; position:absolute; top:0; left:0; bottom:0; width:5px; background:var(--rule);}
+  .lead.gold::before{background:var(--lime);}
+  .lead .rk{font-family:'Space Grotesk',sans-serif; font-size:12px; color:var(--muted); letter-spacing:.04em; font-weight:600;}
+  .lead .bk{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16px; margin:3px 0 9px; color:var(--teal);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .lead .pct{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:36px; letter-spacing:-.02em; line-height:1; color:var(--ink);}
+  .lead .pct small{font-size:17px; font-weight:600; color:var(--muted); margin-left:2px;}
+  .lead .crown{position:absolute; top:15px; right:17px; font-family:'Space Grotesk',sans-serif; font-size:10px;
+    color:var(--green-text); letter-spacing:.1em; text-transform:uppercase; font-weight:600;
+    background:var(--lime-soft); padding:3px 8px; border-radius:20px;}
+
+  /* Controls */
+  .controls{display:flex; align-items:center; gap:12px; margin:22px 0 12px; flex-wrap:wrap;}
+  .search{flex:1; min-width:200px; position:relative;}
+  .search input{width:100%; padding:11px 12px 11px 36px; border:1.5px solid var(--rule); border-radius:24px;
+    background:var(--card); font-family:'Inter',sans-serif; font-size:14px; color:var(--ink);}
+  .search input:focus{outline:none; border-color:var(--green); box-shadow:0 0 0 3px rgba(93,161,46,.15);}
+  .search svg{position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--muted);}
+  .seg{display:flex; border:1.5px solid var(--rule); border-radius:24px; overflow:hidden; background:var(--card);}
+  .seg button{appearance:none; border:0; background:none; cursor:pointer; padding:9px 15px;
+    font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:600; color:var(--muted);}
+  .seg button[aria-pressed="true"]{background:var(--teal); color:#fff;}
+  .seg button:not(:last-child){border-right:1.5px solid var(--rule);}
+  .upload{display:inline-flex; align-items:center; gap:8px; padding:10px 18px; border-radius:24px;
+    border:0; background:var(--green); color:#fff; cursor:pointer; font-weight:600;
+    font-size:13.5px; font-family:'Space Grotesk',sans-serif; white-space:nowrap; transition:background .15s;}
+  .upload:hover{background:#4F8C26;}
+  .upload .arrow{font-size:15px; line-height:1; margin-left:1px;}
+  .upload input{display:none;}
+
+  /* Table */
+  .tablecard{background:var(--card); border:1px solid var(--rule); border-radius:16px; overflow:hidden;}
+  table{width:100%; border-collapse:collapse;}
+  thead th{font-family:'Space Grotesk',sans-serif; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--teal-text); text-align:left; padding:13px 16px; background:#F6F4EA; border-bottom:2px solid var(--rule);
+    position:sticky; top:0; font-weight:600;}
+  th.r,td.r{text-align:right;}
+  tbody td{padding:12px 16px; border-bottom:1px solid var(--rule-2); vertical-align:middle;}
+  tbody tr:last-child td{border-bottom:0;}
+  tbody tr:hover{background:#FAF9F1;}
+  .rank{font-family:'Space Grotesk',sans-serif; color:var(--muted); font-size:13px; width:42px; font-weight:500;}
+  .bankname{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14.5px; color:var(--teal);}
+  a.bankname{text-decoration:none; cursor:pointer; transition:color .12s;}
+  a.bankname:hover{text-decoration:underline; text-decoration-thickness:1.5px; text-underline-offset:2px; color:var(--teal-2);}
+  .tag{display:inline-block; font-family:'Space Grotesk',sans-serif; font-size:9.5px; letter-spacing:.06em;
+    text-transform:uppercase; padding:2px 8px; border-radius:20px; margin-left:8px; vertical-align:middle; font-weight:600;}
+  .tag.you{background:var(--lime-soft); color:var(--green-text);}
+  .tag.stale{background:#EFEADB; color:#8A8158;}
+  .apy{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:16.5px; color:var(--ink); font-variant-numeric:tabular-nums;}
+  .apy small{font-size:11px; color:var(--muted); font-weight:500;}
+  .delta{font-family:'Space Grotesk',sans-serif; font-size:13px; white-space:nowrap; font-variant-numeric:tabular-nums; font-weight:500;}
+  .delta.up{color:var(--green-text);} .delta.down{color:var(--down);} .delta.flat{color:var(--muted);}
+  .spark{width:128px;}
+  tr.nelnet{background:var(--lime-soft);}
+  tr.nelnet:hover{background:#E1EFC8;}
+  tr.nelnet td:first-child{box-shadow:inset 4px 0 0 var(--lime);}
+  tr.stale .apy{color:var(--muted);}
+
+  .foot{margin-top:18px; color:var(--muted); font-size:12.5px; line-height:1.65;}
+  .foot strong{color:var(--teal); font-weight:600; font-family:'Space Grotesk',sans-serif;}
+  .toast{position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px);
+    background:var(--teal); color:#fff; padding:12px 20px; border-radius:24px; font-size:13.5px; font-weight:500;
+    font-family:'Space Grotesk',sans-serif;
+    opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; z-index:50; box-shadow:0 8px 30px rgba(31,46,45,.3);}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  .count{font-family:'Space Grotesk',sans-serif; font-size:12px; color:var(--muted); font-weight:500;}
+
+  @media (max-width:720px){
+    .board{grid-template-columns:1fr;}
+    .spark, th.sp{display:none;}
+    .brand h1{font-size:27px;}
+    .wrap{padding:0 16px 48px;}
+    .masthead{padding:20px 18px;}
+  }
+  @media (prefers-reduced-motion:reduce){ *{transition:none!important;} }
+  /* Layout: table + calculator side by side */
+  .layout{display:grid; grid-template-columns:1fr 330px; gap:18px; align-items:start;}
+
+  /* Earnings calculator */
+  .calc{background:var(--card); border:1px solid var(--rule); border-radius:12px; padding:18px 18px 16px; position:sticky; top:16px;}
+  .calc-head{font-family:'Spectral',Georgia,serif; font-style:italic; font-weight:600; font-size:20px; color:var(--ink); margin:0 0 4px;}
+  .calc-sub{font-family:'Space Grotesk',sans-serif; font-size:11px; letter-spacing:.04em; color:var(--muted); margin-bottom:15px;}
+  .calc-field{display:block; margin-bottom:12px;}
+  .calc-field>span{display:block; font-family:'Space Grotesk',sans-serif; font-size:10.5px; letter-spacing:.13em;
+    text-transform:uppercase; color:var(--muted); margin-bottom:5px;}
+  .calc-field select, .calc-field input, .money input{width:100%; padding:9px 11px; border:1px solid var(--rule); border-radius:8px;
+    background:var(--cream); font-family:'Inter',sans-serif; font-size:14px; color:var(--ink);}
+  .calc-field select:focus, .calc-field input:focus, .money input:focus{outline:none; border-color:var(--teal); box-shadow:0 0 0 3px rgba(59,87,89,.14);}
+  .money{position:relative; display:flex; align-items:center;}
+  .money input{font-family:'Space Grotesk',sans-serif; font-variant-numeric:tabular-nums;}
+  .money .dol{position:absolute; left:11px; color:var(--muted); font-size:14px; pointer-events:none;}
+  .money .dol + input{padding-left:23px;}
+  .money .pcts{position:absolute; right:12px; color:var(--muted); font-size:14px; pointer-events:none;}
+  .calc-results{margin-top:10px; border-top:1px solid var(--rule-2); padding-top:4px;}
+  .cres{display:flex; justify-content:space-between; align-items:baseline; padding:9px 0; border-bottom:1px solid var(--rule-2);}
+  .cres:last-child{border-bottom:0;}
+  .cres.match{background:var(--lime-soft); margin:2px -10px; padding:9px 10px; border-radius:8px; border-bottom:0;}
+  .cres .yr{font-family:'Space Grotesk',sans-serif; font-size:12.5px; color:var(--muted); font-weight:500;}
+  .cres.match .yr{color:var(--teal-text); font-weight:600;}
+  .cres .rt{text-align:right;}
+  .cres .bal{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:17px; color:var(--ink); font-variant-numeric:tabular-nums;}
+  .cres .int{font-family:'Space Grotesk',sans-serif; font-size:11px; color:var(--green-text); display:block; margin-top:1px;}
+  .calc-note{margin-top:13px; font-size:10.5px; color:var(--muted); line-height:1.5;}
+
+  @media (max-width:920px){
+    .layout{grid-template-columns:1fr;}
+    .calc{position:static;}
+  }
+</style>
+</head>
+<body>
+  <header class="masthead">
+    <div class="brand">
+      <span class="logo"><span class="ring">n</span>elnetbank</span>
+      <span class="eyebrow">Industry APY Tracker</span>
+      <h1>Deposit Rate Board<span class="mk">&not;</span></h1>
+    </div>
+    <div class="asof">
+      <div class="lab">Rates as of</div>
+      <div class="val" id="asof">&mdash;</div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="tabs" id="tabs" role="tablist"></div>
+
+    <div class="board" id="board"></div>
+
+    <div class="controls">
+      <div class="search">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+        <input id="search" type="text" placeholder="Filter banks&hellip;" autocomplete="off">
+      </div>
+      <div class="seg" role="group" aria-label="Sort">
+        <button id="sortRate" aria-pressed="true">Rate</button>
+        <button id="sortName" aria-pressed="false">A&ndash;Z</button>
+      </div>
+    </div>
+
+    <div class="layout">
+      <div class="tablecard">
+        <table>
+          <thead>
+            <tr>
+              <th class="rank">#</th>
+              <th>Bank</th>
+              <th class="r">Current APY</th>
+              <th class="r">Change</th>
+              <th class="sp">20-month trend</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+
+      <aside class="calc" aria-label="Earnings calculator">
+        <div class="calc-head">Earnings calculator</div>
+        <div class="calc-sub">See what a deposit could grow to.</div>
+
+        <label class="calc-field">
+          <span>Deposit amount</span>
+          <div class="money"><span class="dol">$</span><input id="calcAmt" type="text" inputmode="decimal" value="10,000" autocomplete="off"></div>
+        </label>
+        <label class="calc-field">
+          <span>Product</span>
+          <select id="calcProduct"></select>
+        </label>
+        <label class="calc-field">
+          <span>Bank</span>
+          <select id="calcBank"></select>
+        </label>
+        <label class="calc-field">
+          <span>APY used (you can edit)</span>
+          <div class="money"><input id="calcApy" type="text" inputmode="decimal" autocomplete="off"><span class="pcts">%</span></div>
+        </label>
+
+        <label class="calc-field" id="calcCustomWrap">
+          <span>What if&hellip; (months)</span>
+          <input id="calcMonths" type="text" inputmode="numeric" placeholder="e.g. 6" autocomplete="off">
+        </label>
+
+        <div class="calc-results" id="calcResults"></div>
+        <div class="calc-note">Assumes the APY stays constant and interest compounds annually. Projection only &mdash; not a guarantee of future rates or earnings.</div>
+      </aside>
+    </div>
+
+    <div class="foot">
+      <span class="count" id="count"></span><br>
+      <strong>Updating:</strong> replace <code>rates.xlsx</code> in the repository with a fresh copy of the workbook
+      (same layout &mdash; one sheet per product, banks down the side, dates across the top) and commit. The board reloads it
+      automatically on the next visit. Banks tagged <em>stale</em> stopped reporting before the latest date, so their figure
+      is the last one on file.
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+const DATA = "{\"asof\": \"2026-06-16\", \"products\": {\"HYSA\": {\"dates\": [\"2024-10-16\", \"2024-10-25\", \"2024-11-19\", \"2024-11-26\", \"2024-12-19\", \"2025-01-27\", \"2025-02-25\", \"2025-03-24\", \"2025-04-23\", \"2025-05-19\", \"2025-06-24\", \"2025-07-28\", \"2025-08-18\", \"2025-09-23\", \"2025-10-22\", \"2025-11-24\", \"2025-12-22\", \"2026-01-22\", \"2026-02-23\", \"2026-03-24\", \"2026-04-22\", \"2026-05-21\", \"2026-06-16\"], \"banks\": [{\"bank\": \"Ally\", \"current\": 3.0, \"previous\": 3.1, \"asof_idx\": 22, \"stale\": false, \"series\": [4.0, 4.0, 4.0, 3.85, 3.8, 3.8, 3.7, 3.7, 3.6, 3.6, 3.5, 3.5, 3.5, 3.5, 3.1, 3.3, 3.3, 3.3, 3.3, 3.2, 3.1, 3.1, 3.0]}, {\"bank\": \"Amex\", \"current\": 3.1, \"previous\": 3.1, \"asof_idx\": 22, \"stale\": false, \"series\": [4.1, 4.0, 4.0, 4.0, 3.8, 3.8, 3.7, 3.7, 3.7, null, null, 3.6, 3.5, 3.5, 3.5, 3.5, 3.4, 3.3, 3.3, 3.2, 3.2, 3.1, 3.1]}, {\"bank\": \"Barclays\", \"current\": 3.4, \"previous\": 3.65, \"asof_idx\": 22, \"stale\": false, \"series\": [4.5, 4.5, 4.5, 4.1, null, 4.0, 4.15, 4.15, 4.15, 4.1, 3.9, 3.9, 3.9, 3.9, 3.9, 3.85, 3.6, 3.6, 3.5, 3.7, 3.65, 3.65, 3.4]}, {\"bank\": \"Bask Bank\", \"current\": 3.75, \"previous\": 3.75, \"asof_idx\": 22, \"stale\": false, \"series\": [4.85, 4.85, 4.65, 4.65, 4.65, 4.5, 4.35, 4.35, 4.2, 4.2, 4.2, 4.2, 4.2, 4.05, 4.05, 3.9, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75]}, {\"bank\": \"BMO Alto\", \"current\": 3.0, \"previous\": 3.15, \"asof_idx\": 22, \"stale\": false, \"series\": [4.6, 4.6, 4.6, 4.45, 4.3, 4.1, 4.0, 3.7, 3.6, 3.6, 3.6, 3.5, 3.5, 3.25, 3.25, 3.25, 3.25, 3.25, 3.15, 3.15, 3.15, 3.15, 3.0]}, {\"bank\": \"Bread\", \"current\": 4.0, \"previous\": 4.0, \"asof_idx\": 22, \"stale\": false, \"series\": [4.75, 4.75, 4.75, 4.75, 4.65, 4.5, 4.4, 4.4, 4.4, 4.3, 4.3, 4.25, 4.25, 4.25, 4.2, 4.15, 4.05, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0]}, {\"bank\": \"BrioDirect\", \"current\": 3.75, \"previous\": 3.75, \"asof_idx\": 22, \"stale\": false, \"series\": [5.05, 5.05, 4.85, 4.85, 4.85, 4.75, 4.55, 4.5, 4.45, 4.35, 4.3, 4.3, 4.3, 4.3, 4.2, 4.0, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75]}, {\"bank\": \"CapitalOne\", \"current\": 3.0, \"previous\": 3.1, \"asof_idx\": 22, \"stale\": false, \"series\": [4.1, 4.0, 4.0, 3.9, 3.8, 3.8, 3.7, 3.7, 3.6, 3.6, 3.6, null, 3.5, 3.5, 3.4, 3.4, 3.4, 3.3, 3.3, 3.2, 3.2, 3.1, 3.0]}, {\"bank\": \"CashApp\", \"current\": 3.25, \"previous\": 3.25, \"asof_idx\": 22, \"stale\": false, \"series\": [4.5, 4.5, 4.5, 4.5, null, null, null, null, null, null, null, 4.0, 4.0, 3.75, 3.75, 3.5, 3.25, 3.25, 3.25, 3.25, 3.25, 3.25, 3.25]}, {\"bank\": \"CIBC\", \"current\": 3.52, \"previous\": 3.52, \"asof_idx\": 22, \"stale\": false, \"series\": [4.61, 4.61, 4.61, 4.51, 4.51, 4.38, 4.28, 4.28, 4.21, 4.11, 4.11, 4.02, 4.02, 4.02, 3.92, 3.77, 3.66, 3.66, 3.66, 3.66, 3.52, 3.52, 3.52]}, {\"bank\": \"CIT Bank\", \"current\": 4.1, \"previous\": 4.1, \"asof_idx\": 22, \"stale\": false, \"series\": [4.7, 4.7, 4.55, 4.55, 4.55, 4.35, 4.3, 4.3, 4.1, 4.1, 4.0, 3.9, 3.9, 3.85, 3.85, 3.75, 3.75, 3.75, 3.75, 4.1, 4.1, 4.1, 4.1]}, {\"bank\": \"Citi\", \"current\": 3.1, \"previous\": 3.1, \"asof_idx\": 22, \"stale\": false, \"series\": [4.1, 4.0, 4.0, 4.0, 3.8, 3.8, null, null, null, null, null, null, null, 3.85, 3.4, 3.3, 3.3, 3.3, 3.2, 3.15, 3.15, 3.1, 3.1]}, {\"bank\": \"EverBank\", \"current\": 3.9, \"previous\": 3.9, \"asof_idx\": 22, \"stale\": false, \"series\": [5.05, 5.05, 4.75, 4.75, 4.75, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.05, 4.05, 4.05, 3.09, 3.9, 3.9, 3.9, 3.9, 3.9, 3.9]}, {\"bank\": \"Forbright Bank\", \"current\": 3.85, \"previous\": 3.85, \"asof_idx\": 22, \"stale\": false, \"series\": [5.0, 5.0, 4.6, 4.6, 4.6, 4.25, 4.25, 4.25, 4.25, 4.25, 4.25, 4.25, 4.25, 4.25, 4.0, 4.0, 4.0, 3.85, 3.85, 3.85, 3.85, 3.85, 3.85]}, {\"bank\": \"Lending Club\", \"current\": 4.0, \"previous\": 4.0, \"asof_idx\": 22, \"stale\": false, \"series\": [5.3, 5.15, 5.0, 4.75, 4.75, 4.5, 4.5, 4.5, 4.4, 4.4, 4.4, 4.2, 4.2, 4.2, 4.2, 4.2, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0]}, {\"bank\": \"Live Oak\", \"current\": 3.8, \"previous\": 3.8, \"asof_idx\": 22, \"stale\": false, \"series\": [4.3, 4.3, 4.3, 4.3, 4.2, 4.2, 4.2, 4.2, 4.2, 4.1, 4.1, 4.1, 4.1, 4.0, 4.0, 3.9, 3.9, 3.8, 3.8, 3.8, 3.8, 3.8, 3.8]}, {\"bank\": \"Marcus\", \"current\": 3.4, \"previous\": 3.5, \"asof_idx\": 22, \"stale\": false, \"series\": [4.1, 4.1, 4.1, 4.1, 3.9, 3.9, 3.9, 3.9, 3.75, 3.75, 3.65, 3.65, 3.65, 3.65, 3.65, 3.65, 3.65, 3.65, 3.65, 3.65, 3.5, 3.5, 3.4]}, {\"bank\": \"my banking direct\", \"current\": 3.9, \"previous\": 3.9, \"asof_idx\": 21, \"stale\": true, \"series\": [null, 5.0, 5.0, 5.0, 4.65, 4.45, 4.45, 4.4, 4.4, 4.4, 4.3, 4.3, 4.3, 4.3, null, 4.02, 4.02, 4.02, 4.02, 4.02, 3.9, 3.9, null]}, {\"bank\": \"Nelnet Bank\", \"current\": 3.25, \"previous\": 3.25, \"asof_idx\": 21, \"stale\": true, \"series\": [4.55, null, null, null, 4.3, 4.05, 4.05, 4.05, 4.05, 4.05, 4.05, 3.9, 3.9, 3.9, 3.65, 3.25, 3.25, 3.25, 3.25, 3.25, 3.25, 3.25, null]}, {\"bank\": \"Openbank\", \"current\": 3.8, \"previous\": 4.0, \"asof_idx\": 22, \"stale\": false, \"series\": [5.25, 5.25, 5.0, 5.0, 4.75, 4.75, 4.75, 4.4, 4.4, 4.4, 4.3, 4.2, 4.2, 4.2, 4.2, 4.2, 4.2, 4.2, 4.09, 4.09, 4.0, 4.0, 3.8]}, {\"bank\": \"Peak Bank\", \"current\": 4.01, \"previous\": 3.82, \"asof_idx\": 22, \"stale\": false, \"series\": [5.07, 5.07, 5.07, 5.07, 4.75, 4.75, 4.35, 4.54, 4.54, 4.44, 4.44, 4.44, 4.35, 4.35, 4.2, 4.2, 4.2, 3.99, 4.02, 4.02, 3.82, 3.82, 4.01]}, {\"bank\": \"PNC\", \"current\": 0.02, \"previous\": 3.25, \"asof_idx\": 22, \"stale\": false, \"series\": [4.65, 4.65, 4.15, 4.15, 4.15, 3.95, 3.95, 3.95, 3.95, null, null, null, null, 3.85, 3.85, 3.53, 3.3, 3.3, 3.3, 3.25, 3.25, 3.25, 0.02]}, {\"bank\": \"Poppy Bank\", \"current\": 0.5, \"previous\": 4.0, \"asof_idx\": 22, \"stale\": false, \"series\": [5.0, 5.0, 5.0, 4.75, 4.75, 4.5, 4.5, 4.25, null, 4.25, 4.25, 4.25, 4.25, 4.25, 4.25, null, 4.0, 3.75, 3.75, 4.0, 4.0, 4.0, 0.5]}, {\"bank\": \"Popular Direct\", \"current\": 3.9, \"previous\": 3.9, \"asof_idx\": 22, \"stale\": false, \"series\": [4.85, 4.76, 4.6, 4.6, 4.6, 4.6, 4.3, 4.1, null, 4.05, null, null, 4.05, 4.1, 4.05, 4.0, 3.9, 3.9, 3.9, 3.9, 3.9, 3.9, 3.9]}, {\"bank\": \"Primis\", \"current\": 3.85, \"previous\": 3.85, \"asof_idx\": 22, \"stale\": false, \"series\": [4.75, 4.75, 4.75, 4.75, 4.7, 4.35, 4.35, 4.35, 4.35, 4.35, 4.35, 4.2, null, 3.85, 3.85, 3.85, 3.85, 3.85, 3.85, 3.85, 3.85, 3.85, 3.85]}, {\"bank\": \"Quontic\", \"current\": 3.2, \"previous\": 3.2, \"asof_idx\": 22, \"stale\": false, \"series\": [4.5, 4.5, 4.75, 4.0, 4.0, 3.85, 3.85, 3.85, 3.85, 3.85, 3.85, null, null, 3.75, 3.75, 3.75, 3.75, 3.5, 3.5, 3.5, 3.35, 3.2, 3.2]}, {\"bank\": \"Rising Bank\", \"current\": 3.75, \"previous\": 3.75, \"asof_idx\": 22, \"stale\": false, \"series\": [null, 4.5, 4.5, 4.5, 4.5, 4.4, 4.4, 4.4, 4.3, 4.3, 4.3, 4.3, 4.3, 4.3, 4.1, 3.95, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75]}, {\"bank\": \"Sallie Mae\", \"current\": 3.75, \"previous\": 3.75, \"asof_idx\": 22, \"stale\": false, \"series\": [4.2, 4.2, 4.2, 4.2, 4.1, 4.0, 3.9, 3.9, 3.9, 3.9, 3.9, 3.9, 3.9, 3.9, 3.9, 3.9, 3.9, 3.9, 3.85, 3.85, 3.75, 3.75, 3.75]}, {\"bank\": \"SoFi\", \"current\": 3.8, \"previous\": 3.3, \"asof_idx\": 22, \"stale\": false, \"series\": [null, 4.3, 4.3, 4.3, 4.0, 4.0, 3.8, 3.8, null, null, null, 3.8, 3.8, 3.8, 3.8, 3.6, 3.6, 3.3, 3.3, 3.3, 3.3, 3.3, 3.8]}, {\"bank\": \"Synchrony\", \"current\": 3.3, \"previous\": 3.4, \"asof_idx\": 22, \"stale\": false, \"series\": [4.3, 4.3, 4.3, 4.1, 4.1, 4.1, 4.0, 4.0, 4.0, 4.0, 3.8, null, null, 3.8, 3.8, 3.65, 3.65, 3.65, 3.5, 3.5, 3.4, 3.4, 3.3]}, {\"bank\": \"Tab Bank\", \"current\": 3.61, \"previous\": 3.61, \"asof_idx\": 22, \"stale\": false, \"series\": [4.52, 4.52, 4.52, 4.52, 4.37, 4.26, 4.26, 4.26, 4.26, 4.26, 4.26, 4.15, 4.15, 4.15, 3.8, 3.8, 3.8, 3.61, 3.61, 3.61, 3.61, 3.61, 3.61]}, {\"bank\": \"UFB Direct\", \"current\": 3.26, \"previous\": 3.26, \"asof_idx\": 22, \"stale\": false, \"series\": [4.57, 4.57, 4.31, 4.31, 4.01, 4.01, 4.01, 4.01, 4.01, 4.01, 4.01, 4.01, 4.1, 3.9, 3.76, 3.51, 3.4, 3.26, 3.26, 3.26, 3.26, 3.26, 3.26]}, {\"bank\": \"Varo\", \"current\": 2.5, \"previous\": 2.5, \"asof_idx\": 22, \"stale\": false, \"series\": [4.0, 3.0, 3.0, 3.0, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5]}, {\"bank\": \"Vio Bank\", \"current\": 4.01, \"previous\": 4.03, \"asof_idx\": 22, \"stale\": false, \"series\": [null, 5.05, 4.9, 4.9, null, 4.46, 4.46, 1.1, 1.1, 1.1, 1.1, 1.1, 4.31, 4.31, 4.26, 4.16, 4.16, 4.09, 4.03, 4.03, 4.03, 4.03, 4.01]}, {\"bank\": \"Western Alliance\", \"current\": 3.8, \"previous\": 3.8, \"asof_idx\": 22, \"stale\": false, \"series\": [4.96, 4.81, 4.46, 4.46, 4.46, 4.35, 4.3, 4.3, 4.25, null, null, 4.25, 4.3, 4.2, 4.1, 4.1, 3.9, 3.8, 3.8, 3.8, 3.8, 3.8, 3.8]}]}, \"12 Month CDs\": {\"dates\": [\"2024-10-25\", \"2024-11-19\", \"2024-11-26\", \"2024-12-19\", \"2025-01-27\", \"2025-02-25\", \"2025-03-24\", \"2025-04-23\", \"2025-05-19\", \"2025-06-23\", \"2025-07-28\", \"2025-08-19\", \"2025-09-22\", \"2025-10-22\", \"2025-11-24\", \"2025-12-22\", \"2026-01-23\", \"2026-02-23\", \"2026-03-24\", \"2026-04-22\", \"2026-05-21\", \"2026-06-16\"], \"banks\": [{\"bank\": \"AFCU\", \"current\": 3.95, \"previous\": 3.95, \"asof_idx\": 21, \"stale\": false, \"series\": [4.5, 4.45, 4.45, 4.45, null, 4.35, 4.35, 4.35, 4.35, 4.35, 4.35, 4.3, 4.2, 4.1, 4.0, 3.95, 3.95, 3.95, 3.95, 3.95, 3.95, 3.95]}, {\"bank\": \"Ally\", \"current\": 3.7, \"previous\": 3.7, \"asof_idx\": 21, \"stale\": false, \"series\": [4.25, 4.1, 4.0, 3.9, 3.9, 3.9, 3.9, 3.9, 3.85, 3.85, 3.85, 3.85, 3.85, 3.85, 3.85, 3.85, 3.75, 3.75, 3.7, 3.7, 3.7, 3.7]}, {\"bank\": \"Amex\", \"current\": 3.25, \"previous\": 3.25, \"asof_idx\": 21, \"stale\": false, \"series\": [3.85, 3.85, 3.6, 3.6, 3.6, 3.85, 3.85, 3.85, 3.85, 3.5, null, 3.25, 3.25, 3.25, 3.25, 3.25, 3.25, 3.25, 3.25, 3.25, 3.25, 3.25]}, {\"bank\": \"Bank5 Connect\", \"current\": 3.2, \"previous\": 3.2, \"asof_idx\": 21, \"stale\": false, \"series\": [4.25, 4.25, 4.25, 4.25, 4.25, 3.95, 3.95, 3.95, 3.95, null, null, 3.95, 3.95, 3.75, 3.65, 3.5, 3.5, 3.5, 3.2, 3.2, 3.2, 3.2]}, {\"bank\": \"Bask Bank\", \"current\": 4.05, \"previous\": 4.0, \"asof_idx\": 20, \"stale\": true, \"series\": [4.4, 4.25, 4.25, 4.25, 4.25, 4.4, 4.4, 4.3, 4.3, 4.3, 4.3, 4.3, 4.0, 4.0, 3.85, 3.75, 3.75, 3.75, 3.75, 4.0, 4.05, null]}, {\"bank\": \"BMO Alto\", \"current\": 2.5, \"previous\": 2.5, \"asof_idx\": 21, \"stale\": false, \"series\": [4.3, 4.3, 4.3, 4.2, 4.1, 3.9, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 2.75, 2.75, 2.75, 2.6, 2.5, 2.5, 2.5, 2.5, 2.5]}, {\"bank\": \"Bread\", \"current\": 4.0, \"previous\": 3.85, \"asof_idx\": 21, \"stale\": false, \"series\": [4.3, 4.3, 4.3, 4.3, 4.1, 4.1, 4.1, 4.1, 4.0, 4.0, 4.0, 4.0, 4.0, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.85, 3.85, 4.0]}, {\"bank\": \"Capital One\", \"current\": 3.9, \"previous\": 3.9, \"asof_idx\": 21, \"stale\": false, \"series\": [4.2, 4.1, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, null, 4.0, 4.0, 3.85, 4.05, 3.9, 3.9, 3.75, 3.75, 3.9, 3.9, 3.9]}, {\"bank\": \"CIBC\", \"current\": 4.0, \"previous\": 4.0, \"asof_idx\": 21, \"stale\": false, \"series\": [4.56, 4.43, 4.31, 4.31, 4.21, 4.21, 4.21, 4.01, 4.01, 4.01, 4.01, 4.01, 4.01, 3.76, 3.76, 3.66, 3.66, 3.66, 3.66, 4.0, 4.0, 4.0]}, {\"bank\": \"Citizens\", \"current\": 3.25, \"previous\": 3.25, \"asof_idx\": 21, \"stale\": false, \"series\": [4.25, 4.25, 4.25, 4.25, 4.0, null, 4.35, 3.5, 3.5, 3.5, 3.5, 3.6, 3.6, 3.6, 3.6, 3.35, 3.25, 3.25, 3.2, 3.25, 3.25, 3.25]}, {\"bank\": \"EverBank\", \"current\": 3.4, \"previous\": 3.4, \"asof_idx\": 21, \"stale\": false, \"series\": [4.0, 4.0, 3.9, 3.9, 3.9, 3.9, 4.0, 4.0, 4.0, 4.0, 3.8, 3.8, 3.7, 3.65, 3.6, 3.5, 3.5, 3.4, 3.4, 3.4, 3.4, 3.4]}, {\"bank\": \"FinWise\", \"current\": 3.85, \"previous\": 4.0, \"asof_idx\": 21, \"stale\": false, \"series\": [4.59, null, null, null, null, 4.35, null, null, null, null, null, null, 4.25, 4.25, 3.95, 3.95, 3.85, 3.85, 3.78, 4.0, 4.0, 3.85]}, {\"bank\": \"First Internet\", \"current\": 3.67, \"previous\": 3.67, \"asof_idx\": 21, \"stale\": false, \"series\": [4.42, 4.42, 4.42, 4.42, 4.2, 4.2, 4.2, 4.2, 4.2, 4.4, 4.28, 4.19, 4.14, 3.93, 3.83, 3.6, 3.67, 3.67, 3.67, 3.67, 3.67, 3.67]}, {\"bank\": \"GTE Financial\", \"current\": 3.56, \"previous\": 3.56, \"asof_idx\": 20, \"stale\": true, \"series\": [4.59, 4.59, 4.59, 4.59, 3.66, 3.66, 3.66, 3.66, 3.66, 3.66, 3.66, 3.66, 3.66, 3.95, 4.02, 4.02, 4.02, 3.56, 3.56, 3.56, 3.56, null]}, {\"bank\": \"HSBC\", \"current\": 3.7, \"previous\": 3.55, \"asof_idx\": 21, \"stale\": false, \"series\": [3.8, 4.0, 4.0, 4.0, 3.9, 4.0, null, null, null, null, null, null, 3.5, 3.4, 3.4, 3.4, 3.35, 3.35, 3.4, 3.6, 3.55, 3.7]}, {\"bank\": \"iGoBanking\", \"current\": 0.15, \"previous\": 0.15, \"asof_idx\": 20, \"stale\": true, \"series\": [4.15, 4.15, 4.15, 4.15, null, null, null, null, 4.0, 4.0, 4.0, 3.85, 3.85, 3.85, 3.65, 3.5, 3.5, 3.5, 0.15, 0.15, 0.15, null]}, {\"bank\": \"Lending Club\", \"current\": 3.5, \"previous\": 3.5, \"asof_idx\": 21, \"stale\": false, \"series\": [4.0, 4.0, 4.0, 4.0, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, null, 3.75, 3.75, 3.75, 3.75, 3.5, 3.9, 3.5, 3.5, 3.5, 3.5, 3.5]}, {\"bank\": \"Limelight\", \"current\": 4.1, \"previous\": 4.03, \"asof_idx\": 21, \"stale\": false, \"series\": [4.5, 4.4, 4.4, 4.5, 4.25, 4.25, 4.25, 4.25, 4.2, 4.35, 4.4, 4.3, 4.2, 4.05, 4.05, 4.05, 4.0, 4.0, 4.1, 4.03, 4.03, 4.1]}, {\"bank\": \"LiveOak\", \"current\": 3.9, \"previous\": 4.0, \"asof_idx\": 21, \"stale\": false, \"series\": [4.5, 4.3, 4.3, 4.4, null, 4.3, 4.3, 4.1, 4.1, 4.1, 4.1, 4.1, 4.1, 3.9, 4.0, 4.0, 3.9, 3.8, 3.8, 3.9, 4.0, 3.9]}, {\"bank\": \"Marcus\", \"current\": 3.9, \"previous\": 3.9, \"asof_idx\": 21, \"stale\": false, \"series\": [null, 4.1, 4.1, 4.25, 4.25, 4.25, 4.25, 4.25, 4.1, 4.1, 4.2, 4.2, 4.1, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 3.9, 3.9]}, {\"bank\": \"Merrick\", \"current\": 4.1, \"previous\": 4.05, \"asof_idx\": 21, \"stale\": false, \"series\": [4.2, 4.2, 4.3, 4.25, 4.35, 4.35, 4.25, 4.0, 4.05, 4.35, 4.15, 4.05, 3.75, 3.7, 3.7, 3.8, 3.65, 3.75, 3.85, 3.95, 4.05, 4.1]}, {\"bank\": \"Nelnet Bank\", \"current\": 3.05, \"previous\": 3.05, \"asof_idx\": 20, \"stale\": true, \"series\": [null, null, null, 4.1, 4.1, 4.1, 4.1, 4.1, 4.0, 4.0, 3.85, 3.85, 3.85, 3.7, 3.5, 3.25, 3.25, 3.25, 3.05, 3.05, 3.05, null]}, {\"bank\": \"NexBank\", \"current\": 3.95, \"previous\": 3.95, \"asof_idx\": 21, \"stale\": false, \"series\": [4.42, 4.27, 4.42, 4.52, null, 4.4, 4.4, 4.4, 4.4, 4.4, 4.4, null, 4.05, 3.8, 3.55, 3.96, 3.8, 3.65, 3.65, 3.95, 3.95, 3.95]}, {\"bank\": \"Popular Direct\", \"current\": 4.15, \"previous\": 4.05, \"asof_idx\": 21, \"stale\": false, \"series\": [4.1, 4.25, 4.35, null, null, 4.25, 4.25, null, 4.4, 4.4, null, 4.25, 3.75, 3.75, 4.0, 4.0, 4.0, 4.0, 4.05, 4.05, 4.05, 4.15]}, {\"bank\": \"Quontic\", \"current\": 3.0, \"previous\": 3.0, \"asof_idx\": 21, \"stale\": false, \"series\": [null, 4.0, 4.0, 4.0, 4.0, 3.25, 3.25, 3.25, 3.25, 3.25, null, null, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0]}, {\"bank\": \"Sallie Mae\", \"current\": 3.8, \"previous\": 3.8, \"asof_idx\": 21, \"stale\": false, \"series\": [4.1, 4.1, 4.1, 4.1, 4.1, 4.0, 4.15, 4.25, 4.4, 4.2, 4.2, 4.1, 4.1, 4.0, 4.0, 4.0, 4.0, 3.8, 3.8, 3.8, 3.8, 3.8]}, {\"bank\": \"SchoolsFirst\", \"current\": 3.95, \"previous\": 3.75, \"asof_idx\": 21, \"stale\": false, \"series\": [4.2, 4.2, 4.2, 4.15, 4.15, null, null, null, null, 4.15, null, null, 4.15, 4.05, 4.05, 3.9, 3.9, 3.9, 3.75, 3.75, 3.75, 3.95]}, {\"bank\": \"Synchrony\", \"current\": 3.7, \"previous\": 3.7, \"asof_idx\": 21, \"stale\": false, \"series\": [4.2, 4.1, 4.0, 4.0, 4.0, 4.0, 4.0, null, null, null, null, null, 4.0, 4.0, 3.9, 3.8, 3.8, 3.8, 3.8, 3.7, 3.7, 3.7]}, {\"bank\": \"Tab\", \"current\": 4.0, \"previous\": 3.9, \"asof_idx\": 21, \"stale\": false, \"series\": [4.25, 4.25, 4.25, 4.52, 4.21, 4.21, 4.21, 4.21, 4.21, 4.21, 4.1, 4.1, 4.1, 3.98, 3.98, 3.98, 3.9, 3.9, 3.9, 3.9, 3.9, 4.0]}, {\"bank\": \"UBT\", \"current\": 3.75, \"previous\": 3.65, \"asof_idx\": 21, \"stale\": false, \"series\": [4.3, 4.3, 4.1, 4.1, 4.0, 4.0, 4.0, 4.0, 4.0, null, null, null, 3.85, 3.85, 3.85, 3.8, 3.65, 3.65, 3.55, 3.55, 3.65, 3.75]}, {\"bank\": \"Vio\", \"current\": 3.8, \"previous\": 3.8, \"asof_idx\": 21, \"stale\": false, \"series\": [4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 3.85, 3.85, 4.0, 4.0, 4.0, 3.9, 3.8, 3.7, 3.7, 3.7, 3.7, 3.8, 3.8, 3.8, 3.8]}]}, \"2 Year CDs\": {\"dates\": [\"2024-10-25\", \"2024-11-19\", \"2024-11-26\", \"2024-12-19\", \"2025-01-27\", \"2025-02-25\", \"2025-03-26\", \"2025-04-23\", \"2025-05-20\", \"2025-06-24\", \"2025-07-28\", \"2025-08-19\", \"2025-09-22\", \"2025-10-22\", \"2025-11-24\", \"2025-12-22\", \"2026-01-23\", \"2026-02-23\", \"2026-03-24\", \"2026-04-22\", \"2026-05-21\", \"2026-06-16\"], \"banks\": [{\"bank\": \"AFCU\", \"current\": 4.05, \"previous\": 4.05, \"asof_idx\": 21, \"stale\": false, \"series\": [4.1, 4.15, 4.15, 4.15, 4.15, 4.15, 4.1, 4.1, 4.1, 4.1, null, 4.1, 4.05, 4.25, 4.15, 4.05, 4.05, 4.05, 4.05, 4.05, 4.05, 4.05]}, {\"bank\": \"Ally\", \"current\": 3.0, \"previous\": 3.0, \"asof_idx\": 21, \"stale\": false, \"series\": [3.5, 3.5, 3.4, 3.4, null, null, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.25, 3.0, 3.0, 3.0]}, {\"bank\": \"Amex\", \"current\": 3.0, \"previous\": 3.0, \"asof_idx\": 21, \"stale\": false, \"series\": [3.5, 3.5, 3.5, 3.5, 3.5, 4.0, 4.0, 3.85, 3.85, 3.85, null, 3.85, 3.85, 3.6, 3.6, 3.6, 3.6, 3.0, 3.0, 3.25, 3.0, 3.0]}, {\"bank\": \"Bask Bank\", \"current\": 3.65, \"previous\": 3.65, \"asof_idx\": 20, \"stale\": true, \"series\": [3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 3.9, 3.75, 3.65, 3.65, 3.65, 3.65, 3.65, 3.65, 3.65, null]}, {\"bank\": \"BMO Alto\", \"current\": 2.55, \"previous\": 2.5, \"asof_idx\": 21, \"stale\": false, \"series\": [3.9, 3.9, 3.9, 3.8, 3.7, 3.5, 2.75, 2.75, 2.75, 2.75, 2.75, 2.75, 2.25, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.5, 2.55]}, {\"bank\": \"Bread\", \"current\": 4.0, \"previous\": 3.85, \"asof_idx\": 21, \"stale\": false, \"series\": [3.85, 3.85, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 3.9, 3.9, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.85, 3.85, 4.0]}, {\"bank\": \"Capital One\", \"current\": 3.5, \"previous\": 3.5, \"asof_idx\": 21, \"stale\": false, \"series\": [3.7, 3.7, 3.6, 3.5, 3.5, 3.5, 3.5, null, 3.5, 3.5, 3.8, 3.8, 3.6, 3.5, 3.5, 3.6, 3.6, 3.5, 3.5, 3.5, 3.5, 3.5]}, {\"bank\": \"CIBC\", \"current\": 3.0, \"previous\": 3.3, \"asof_idx\": 21, \"stale\": false, \"series\": [3.7, 3.7, 3.7, 3.7, 3.7, 3.7, 3.7, 3.26, 4.01, 4.01, 4.01, 3.51, 3.51, 3.51, 3.51, 3.51, 3.51, 3.51, 3.51, 3.51, 3.3, 3.0]}, {\"bank\": \"Citizens\", \"current\": 3.0, \"previous\": 3.0, \"asof_idx\": 21, \"stale\": false, \"series\": [3.75, 3.75, 3.75, 3.75, null, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.0, 2.96, 3.0, 3.0, 3.0]}, {\"bank\": \"EverBank\", \"current\": 3.4, \"previous\": 3.4, \"asof_idx\": 21, \"stale\": false, \"series\": [3.7, 3.9, 3.9, 3.9, 3.75, 3.75, 3.75, 3.65, 3.75, 3.65, 3.65, 3.65, 3.5, 3.5, 3.5, 3.5, 3.5, 3.4, 3.4, 3.4, 3.4, 3.4]}, {\"bank\": \"FinWise\", \"current\": 3.84, \"previous\": 3.84, \"asof_idx\": 21, \"stale\": false, \"series\": [4.07, 4.07, 4.07, 4.07, 4.07, 4.0, 4.0, null, null, null, null, null, 4.0, null, 3.84, 3.84, 3.84, 3.84, 3.78, 3.84, 3.84, 3.84]}, {\"bank\": \"First Internet\", \"current\": 3.3, \"previous\": 3.3, \"asof_idx\": 21, \"stale\": false, \"series\": [3.93, 3.93, 3.93, 3.93, 3.93, 3.93, 3.93, 3.93, 3.93, 3.93, 3.82, 3.82, 3.76, 3.56, 3.45, 3.3, 3.3, 3.3, 3.3, 3.3, 3.3, 3.3]}, {\"bank\": \"HSBC\", \"current\": 3.8, \"previous\": 3.5, \"asof_idx\": 21, \"stale\": false, \"series\": [3.25, 3.5, 3.5, 3.5, null, 3.75, null, null, null, null, null, null, 3.1, 3.1, 3.1, 3.15, 3.15, 3.15, 3.2, 3.55, 3.5, 3.8]}, {\"bank\": \"Lending Club\", \"current\": 3.5, \"previous\": 3.5, \"asof_idx\": 21, \"stale\": false, \"series\": [3.75, 3.75, 3.75, 3.75, null, 3.5, 3.5, 3.5, 3.5, 3.5, 3.82, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5]}, {\"bank\": \"LiveOak\", \"current\": 2.0, \"previous\": 2.0, \"asof_idx\": 21, \"stale\": false, \"series\": [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0]}, {\"bank\": \"Marcus\", \"current\": 3.7, \"previous\": 3.7, \"asof_idx\": 21, \"stale\": false, \"series\": [null, 3.7, 3.7, 3.7, 3.8, 4.1, 4.1, 4.1, 3.95, 3.95, 3.95, null, 3.95, 3.95, 3.95, 3.95, 3.95, 3.95, 3.95, 3.7, 3.7, 3.7]}, {\"bank\": \"Merrick\", \"current\": 4.2, \"previous\": 4.15, \"asof_idx\": 21, \"stale\": false, \"series\": [4.0, 4.15, 4.2, 4.15, 4.45, 4.35, 4.15, 3.9, 4.0, 4.1, 4.05, 3.9, 3.65, 3.65, 3.65, 3.8, 3.65, 3.8, 3.95, 3.95, 4.15, 4.2]}, {\"bank\": \"Nelnet Bank\", \"current\": 2.85, \"previous\": 2.85, \"asof_idx\": 20, \"stale\": true, \"series\": [null, null, null, 3.6, 3.6, 3.6, 3.75, 3.6, 3.75, 3.7, 3.5, 3.5, 3.5, 3.45, 3.25, 3.15, 3.15, 3.15, 2.85, 2.85, 2.85, null]}, {\"bank\": \"Popular Direct\", \"current\": 3.85, \"previous\": 3.85, \"asof_idx\": 21, \"stale\": false, \"series\": [3.8, 4.07, 4.17, 4.25, 4.1, 4.15, 4.15, null, 4.15, 4.15, null, 4.1, 3.7, 3.7, 3.45, 3.3, 3.3, 3.3, 3.85, 3.85, 3.85, 3.85]}, {\"bank\": \"Primis\", \"current\": 1.69, \"previous\": 1.69, \"asof_idx\": 20, \"stale\": true, \"series\": [null, 3.85, 3.85, 3.85, 3.85, null, null, 3.85, 3.85, 3.85, 3.58, null, null, 1.69, 1.69, 3.6, 1.69, 1.69, 1.69, 1.69, 1.69, null]}, {\"bank\": \"Quorum\", \"current\": 3.0, \"previous\": 3.0, \"asof_idx\": 20, \"stale\": true, \"series\": [4.25, 4.25, 4.25, 4.25, 4.15, 4.0, 4.0, 4.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0, null]}, {\"bank\": \"Rising Bank\", \"current\": 3.0, \"previous\": 2.55, \"asof_idx\": 21, \"stale\": false, \"series\": [3.2, 3.2, 3.2, 3.2, 3.2, 3.2, 3.2, 3.2, 3.2, 4.0, 3.9, null, 3.55, 3.4, 3.2, 3.0, 3.0, 3.0, 3.0, 3.0, 2.55, 3.0]}, {\"bank\": \"Sallie Mae\", \"current\": 3.85, \"previous\": 3.85, \"asof_idx\": 21, \"stale\": false, \"series\": [3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 4.0, 4.0, 4.1, 4.1, 4.1, 4.0, 3.75, 3.5, 3.5, 3.75, 3.75, 3.75, 3.85, 3.85, 3.85]}, {\"bank\": \"SchoolFirst\", \"current\": 4.0, \"previous\": 3.8, \"asof_idx\": 21, \"stale\": false, \"series\": [4.2, 4.2, 4.2, 4.15, 4.15, null, null, null, null, null, null, null, 4.15, 4.05, 4.05, 3.9, 3.9, 3.9, 3.8, 3.8, 3.8, 4.0]}, {\"bank\": \"Synchrony\", \"current\": 3.5, \"previous\": 3.5, \"asof_idx\": 21, \"stale\": false, \"series\": [3.9, 3.75, 3.5, 3.5, 3.5, 3.5, 3.5, null, null, null, null, null, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 2.5, 3.5, 3.5, 3.5]}, {\"bank\": \"Tab\", \"current\": 4.1, \"previous\": 3.82, \"asof_idx\": 21, \"stale\": false, \"series\": [3.85, 3.85, 3.85, 4.24, 4.06, 4.06, 4.06, 4.06, 4.06, 4.06, 4.0, 4.0, 4.0, 3.82, 3.82, 3.82, 3.82, 3.82, 3.82, 3.82, 3.82, 4.1]}, {\"bank\": \"Vio\", \"current\": 3.5, \"previous\": 3.5, \"asof_idx\": 21, \"stale\": false, \"series\": [3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5]}]}, \"3 Year CDs\": {\"dates\": [\"2024-10-25\", \"2024-11-19\", \"2024-11-26\", \"2024-12-19\", \"2025-01-27\", \"2025-02-25\", \"2025-03-26\", \"2025-04-24\", \"2025-05-20\", \"2025-06-24\", \"2025-07-28\", \"2025-08-19\", \"2025-09-22\", \"2025-10-23\", \"2025-11-24\", \"2025-12-22\", \"2026-01-23\", \"2026-02-23\", \"2026-03-24\", \"2026-04-22\", \"2026-05-21\", \"2026-06-16\"], \"banks\": [{\"bank\": \"AFCU\", \"current\": 4.05, \"previous\": 4.05, \"asof_idx\": 21, \"stale\": false, \"series\": [4.0, 4.15, 4.15, 4.15, 4.15, 4.15, 4.15, 4.15, 4.15, 4.15, null, 4.15, 4.1, 4.1, 4.1, 4.05, 4.05, 4.05, 4.05, 4.05, 4.05, 4.05]}, {\"bank\": \"Ally\", \"current\": 3.4, \"previous\": 3.4, \"asof_idx\": 21, \"stale\": false, \"series\": [3.6, 3.5, 3.4, 3.4, null, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.4, 3.4, 3.4, 3.4, 3.4, 3.4]}, {\"bank\": \"Amex\", \"current\": 2.25, \"previous\": 2.25, \"asof_idx\": 21, \"stale\": false, \"series\": [3.0, 3.0, 3.0, null, null, 3.6, 3.6, 3.6, 3.6, 3.6, null, 3.6, 3.6, 3.35, 3.35, 3.35, 3.35, 2.25, 2.25, 2.25, 2.25, 2.25]}, {\"bank\": \"BMO Alto\", \"current\": 2.6, \"previous\": 2.5, \"asof_idx\": 21, \"stale\": false, \"series\": [3.9, 3.9, 3.9, 3.8, 3.7, 3.5, 2.75, 2.75, 2.75, 2.75, 2.75, 2.75, 2.25, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.5, 2.6]}, {\"bank\": \"Bread\", \"current\": 4.0, \"previous\": 3.85, \"asof_idx\": 21, \"stale\": false, \"series\": [3.5, 3.5, 3.9, 3.9, 3.9, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 3.85, 3.85, 3.75, 3.75, 3.75, 3.7, 3.7, 3.7, 3.85, 3.85, 4.0]}, {\"bank\": \"Captial One\", \"current\": 3.5, \"previous\": 3.5, \"asof_idx\": 21, \"stale\": false, \"series\": [3.6, 3.6, 3.6, 3.5, 3.5, 3.5, 3.5, null, 3.5, 3.5, 3.6, 3.6, 3.6, 3.5, 3.5, 3.6, 3.6, 3.5, 3.5, 3.5, 3.5, 3.5]}, {\"bank\": \"CFG Community\", \"current\": 3.35, \"previous\": 3.35, \"asof_idx\": 21, \"stale\": false, \"series\": [null, 3.85, 3.85, 3.85, 3.75, 3.75, 3.75, 3.75, null, null, null, null, 3.75, 3.5, 3.35, 3.35, 3.35, 3.35, 3.35, 3.35, 3.35, 3.35]}, {\"bank\": \"Citizens\", \"current\": 2.75, \"previous\": 2.75, \"asof_idx\": 21, \"stale\": false, \"series\": [3.1, 3.1, 3.1, 3.1, null, 2.85, 2.85, 3.25, 3.25, null, 3.25, 3.25, 3.25, 3.25, 3.25, 3.25, 3.25, 2.75, 2.71, 2.75, 2.75, 2.75]}, {\"bank\": \"EverBank\", \"current\": 3.4, \"previous\": 3.4, \"asof_idx\": 21, \"stale\": false, \"series\": [3.5, 3.5, 3.5, 3.5, 3.95, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.4, 3.4, 3.4, 3.4, 3.4, 3.4, 3.4, 3.4, 3.4, 3.4]}, {\"bank\": \"FinWise\", \"current\": 3.84, \"previous\": 3.84, \"asof_idx\": 21, \"stale\": false, \"series\": [3.56, null, null, null, 3.56, 4.0, 4.0, null, null, null, null, null, 4.0, null, 3.84, 3.84, 3.84, 3.84, 3.78, 3.84, 3.84, 3.84]}, {\"bank\": \"First Internet\", \"current\": 3.3, \"previous\": 3.3, \"asof_idx\": 21, \"stale\": false, \"series\": [3.77, 3.77, 3.77, 3.77, 3.77, 3.77, 3.77, 3.77, 3.97, 3.97, 3.97, 3.97, 3.87, 3.61, 3.45, 3.3, 3.3, 3.3, 3.3, 3.3, 3.3, 3.3]}, {\"bank\": \"First National Bank\", \"current\": 3.8, \"previous\": 3.8, \"asof_idx\": 21, \"stale\": false, \"series\": [null, 3.9, 3.9, 3.9, null, null, 4.1, null, null, null, 3.9, 3.9, 3.65, 3.65, 3.65, 3.65, 3.65, 3.65, 3.65, 3.8, 3.8, 3.8]}, {\"bank\": \"iGoBanking\", \"current\": 0.15, \"previous\": 0.15, \"asof_idx\": 20, \"stale\": true, \"series\": [3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, null, 3.5, 3.5, 3.5, 3.25, 3.25, 3.25, 3.25, 0.15, 0.15, 0.15, null]}, {\"bank\": \"Lending Club\", \"current\": 3.45, \"previous\": 3.45, \"asof_idx\": 20, \"stale\": true, \"series\": [3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.45, 3.45, 3.87, null, 3.45, null, 3.45, null, null, null, 3.45, 3.45, 3.45, null]}, {\"bank\": \"Limelight\", \"current\": 3.65, \"previous\": 3.65, \"asof_idx\": 21, \"stale\": false, \"series\": [3.95, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.8, null, 3.7, 3.7, 3.7, 3.7, 3.7, 3.65, 3.65, 3.65, 3.65, 3.65, 3.65]}, {\"bank\": \"LiveOak\", \"current\": 2.0, \"previous\": 2.0, \"asof_idx\": 21, \"stale\": false, \"series\": [2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0]}, {\"bank\": \"Marcus\", \"current\": 3.7, \"previous\": 3.7, \"asof_idx\": 21, \"stale\": false, \"series\": [null, 3.65, 3.65, 3.65, 3.75, 4.0, 4.0, 4.0, 3.9, 3.9, 3.9, 3.9, 3.9, 3.9, 3.9, 3.9, 3.9, 3.9, 3.9, 3.7, 3.7, 3.7]}, {\"bank\": \"Merrick\", \"current\": 4.2, \"previous\": 4.15, \"asof_idx\": 21, \"stale\": false, \"series\": [3.95, 4.0, 4.15, 4.1, null, 4.3, 4.1, 3.95, 3.95, 3.95, 3.9, 3.75, 3.6, 3.6, 3.6, 3.7, 3.65, 3.8, 3.95, 3.95, 4.15, 4.2]}, {\"bank\": \"Nelnet Bank\", \"current\": 2.85, \"previous\": 2.85, \"asof_idx\": 20, \"stale\": true, \"series\": [null, null, null, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.3, 3.3, 3.3, 3.3, 3.25, 3.15, 3.15, 3.15, 2.85, 2.85, 2.85, null]}, {\"bank\": \"Popular Direct\", \"current\": 3.85, \"previous\": 3.85, \"asof_idx\": 21, \"stale\": false, \"series\": [3.5, 3.4, 3.4, 4.25, 4.1, 4.1, 4.1, 4.0, 4.15, 4.15, 4.15, 4.0, 3.8, 3.7, 3.45, 3.3, 3.3, 3.3, 3.85, 3.85, 3.85, 3.85]}, {\"bank\": \"Sallie Mae\", \"current\": 3.95, \"previous\": 3.95, \"asof_idx\": 21, \"stale\": false, \"series\": [3.6, 3.6, 3.6, 3.6, null, 3.4, 3.4, 3.4, 3.4, 3.4, 4.0, 4.0, 3.9, 3.9, 3.9, 3.95, 3.95, 3.95, 3.95, 3.95, 3.95, 3.95]}, {\"bank\": \"SchoolsFirst\", \"current\": 4.0, \"previous\": 3.8, \"asof_idx\": 21, \"stale\": false, \"series\": [4.2, 4.2, 4.2, 4.15, 4.15, null, null, 4.15, null, null, null, null, 4.15, 4.05, 4.05, 3.9, 3.9, 3.9, 3.8, 3.8, 3.8, 4.0]}, {\"bank\": \"Synchrony\", \"current\": 3.6, \"previous\": 3.6, \"asof_idx\": 21, \"stale\": false, \"series\": [3.9, 3.75, 3.75, 3.75, 4.0, 4.0, 4.0, 4.0, null, null, null, null, 4.0, 3.75, 3.6, 3.6, 3.6, 3.6, 3.6, 3.6, 3.6, 3.6]}, {\"bank\": \"Tab\", \"current\": 4.15, \"previous\": 3.75, \"asof_idx\": 21, \"stale\": false, \"series\": [3.6, 3.6, 3.6, 4.03, 3.91, 3.91, 3.91, 3.91, 3.91, 3.91, 3.8, 3.8, 3.8, 3.75, 3.75, 3.75, 3.75, 3.75, 3.75, 3.82, 3.75, 4.15]}, {\"bank\": \"Vio\", \"current\": 3.5, \"previous\": 3.5, \"asof_idx\": 21, \"stale\": false, \"series\": [3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5]}, {\"bank\": \"WebBank\", \"current\": 0.25, \"previous\": 0.25, \"asof_idx\": 20, \"stale\": true, \"series\": [2.75, 2.75, 2.75, 2.75, null, 2.75, null, 0.25, 0.25, 0.25, null, null, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, null]}]}}}";
+let MODEL = JSON.parse(DATA);
+
+let state = { product:null, sort:'rate', q:'' };
+
+const $ = s => document.querySelector(s);
+const rowsEl = $('#rows'), boardEl = $('#board'), tabsEl = $('#tabs');
+
+function fmtDate(iso){
+  if(!iso) return '';
+  const d = new Date(iso+'T00:00:00');
+  if(isNaN(d)) return iso;
+  return d.toLocaleDateString('en-US',{month:'short', day:'numeric', year:'numeric'});
+}
+function isNelnet(name){ return /nelnet/i.test(name); }
+
+function productSearchPhrase(prod){
+  prod=prod||'';
+  let m=prod.match(/(\d+)\s*year/i);            if(m) return m[1]+' year CD';
+  if(/12\s*month/i.test(prod)) return '1 year CD';
+  m=prod.match(/(\d+)\s*month/i);               if(m) return m[1]+' month CD';
+  return 'high-yield savings account';
+}
+function bankSearchUrl(bank, prod){
+  const q = bank + ' ' + productSearchPhrase(prod) + ' apply';
+  return 'https://www.google.com/search?q=' + encodeURIComponent(q);
+}
+
+/* Official bank sites (verified). Key = name lowercased, letters+digits only.
+   Any bank not listed falls back to a product-specific web search, so links
+   always work. To set a better link, add or edit an entry below. */
+const BANK_SITES = {
+  ally:'https://www.ally.com/bank/online-savings-account/',
+  amex:'https://www.americanexpress.com/en-us/banking/online-savings/',
+  barclays:'https://banking.barclaysus.com/',
+  baskbank:'https://www.baskbank.com/',
+  bmoalto:'https://www.bmoalto.com/',
+  bread:'https://www.breadsavings.com/',
+  briodirect:'https://www.briodirectbanking.com/high-yield-savings/',
+  capitalone:'https://www.capitalone.com/bank/savings-accounts/',
+  captialone:'https://www.capitalone.com/bank/savings-accounts/',
+  cashapp:'https://cash.app/',
+  cibc:'https://us.cibc.com/',
+  citbank:'https://www.cit.com/',
+  citi:'https://www.citi.com/',
+  citizens:'https://www.citizensbank.com/',
+  everbank:'https://www.everbank.com/',
+  forbrightbank:'https://www.forbrightbank.com/',
+  lendingclub:'https://www.lendingclub.com/',
+  liveoak:'https://www.liveoakbank.com/',
+  marcus:'https://www.marcus.com/',
+  mybankingdirect:'https://www.mybankingdirect.com/',
+  nelnetbank:'https://www.nelnetbank.com/',
+  openbank:'https://www.openbank.us/',
+  peakbank:'https://www.peak.bank/peak-bank/savings',
+  pnc:'https://www.pnc.com/',
+  poppybank:'https://www.poppy.bank/',
+  populardirect:'https://www.populardirect.com/',
+  primis:'https://www.primisbank.com/',
+  quontic:'https://www.quontic.com/',
+  risingbank:'https://www.risingbank.com/',
+  salliemae:'https://www.salliemae.com/banking/',
+  sofi:'https://www.sofi.com/banking/',
+  synchrony:'https://www.synchronybank.com/',
+  tabbank:'https://www.tabbank.com/',
+  tab:'https://www.tabbank.com/',
+  ufbdirect:'https://www.ufbdirect.com/',
+  viobank:'https://www.viobank.com/',
+  vio:'https://www.viobank.com/',
+  afcu:'https://www.americafirst.com/',
+  bank5connect:'https://www.bank5connect.com/',
+  finwise:'https://www.finwise.bank/',
+  firstinternet:'https://www.firstib.com/',
+  gtefinancial:'https://www.gtefinancial.org/',
+  hsbc:'https://www.us.hsbc.com/',
+  igobanking:'https://www.igobanking.com/',
+  limelight:'https://limelightbank.com/',
+  merrick:'https://www.merrickbank.com/',
+  nexbank:'https://www.nexbankpersonal.com/certificates-of-deposit-cds',
+  schoolsfirst:'https://www.schoolsfirstfcu.org/',
+  schoolfirst:'https://www.schoolsfirstfcu.org/',
+  ubt:'https://www.ubt.com/',
+  quorum:'https://www.quorumfcu.org/',
+  cfgcommunity:'https://www.cfg.bank/'
+};
+function bankKey(name){ return String(name).toLowerCase().replace(/[^a-z0-9]/g,''); }
+function bankLink(bank, prod){
+  return BANK_SITES[bankKey(bank)] || bankSearchUrl(bank, prod);
+}
+
+function buildTabs(){
+  tabsEl.innerHTML='';
+  Object.keys(MODEL.products).forEach((k,i)=>{
+    const b=document.createElement('button');
+    b.className='tab'; b.textContent=k; b.setAttribute('role','tab');
+    b.setAttribute('aria-selected', String(k===state.product));
+    b.onclick=()=>{ state.product=k; render(); };
+    tabsEl.appendChild(b);
+  });
+}
+
+function productExtent(banks){
+  let lo=Infinity, hi=-Infinity;
+  banks.forEach(b=>b.series.forEach(v=>{ if(v!=null){ if(v<lo)lo=v; if(v>hi)hi=v; }}));
+  if(!isFinite(lo)){ lo=0; hi=1; }
+  if(lo===hi){ lo-=0.1; hi+=0.1; }
+  return [lo,hi];
+}
+
+function sparkline(series, ext){
+  const W=128, H=34, pad=4;
+  const n=series.length; if(n<2) return '';
+  const [lo,hi]=ext;
+  const x=i=> pad + (W-2*pad)*(i/(n-1));
+  const y=v=> H-pad - (H-2*pad)*((v-lo)/(hi-lo));
+  let d='', started=false;
+  for(let i=0;i<n;i++){
+    const v=series[i]; if(v==null){ started=false; continue; }
+    d += (started?' L':' M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1);
+    started=true;
+  }
+  // last point dot
+  let last=-1; for(let i=n-1;i>=0;i--){ if(series[i]!=null){ last=i; break; } }
+  const dot = last>=0 ? `<circle cx="${x(last).toFixed(1)}" cy="${y(series[last]).toFixed(1)}" r="2.4" fill="var(--ink)"/>` : '';
+  return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
+    <path d="${d.trim()}" fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" opacity="0.78"/>${dot}</svg>`;
+}
+
+function deltaCell(cur, prev){
+  if(prev==null) return '<span class="delta flat">&mdash;</span>';
+  const d = Math.round((cur-prev)*1000)/1000;
+  if(Math.abs(d)<0.0005) return '<span class="delta flat">&mdash;</span>';
+  const up=d>0; const arrow=up?'&#9650;':'&#9660;';
+  return `<span class="delta ${up?'up':'down'}">${arrow} ${Math.abs(d).toFixed(2)}</span>`;
+}
+
+function render(){
+  if(!state.product || !MODEL.products[state.product]) state.product=Object.keys(MODEL.products)[0];
+  $('#asof').textContent = fmtDate(MODEL.asof);
+  buildTabs();
+
+  const prod=MODEL.products[state.product];
+  const ext=productExtent(prod.banks);
+
+  // Leaderboard: top 3 current among non-stale
+  const fresh=prod.banks.filter(b=>!b.stale).sort((a,b)=>b.current-a.current).slice(0,3);
+  boardEl.innerHTML='';
+  fresh.forEach((b,i)=>{
+    const el=document.createElement('div');
+    el.className='lead'+(i===0?' gold':'');
+    el.innerHTML=`${i===0?'<span class="crown">Top rate</span>':''}
+      <div class="rk">#${i+1}</div>
+      <div class="bk">${b.bank}</div>
+      <div class="pct">${b.current.toFixed(2)}<small>%</small></div>`;
+    boardEl.appendChild(el);
+  });
+
+  // Rows
+  let banks=prod.banks.slice();
+  const q=state.q.trim().toLowerCase();
+  if(q) banks=banks.filter(b=>b.bank.toLowerCase().includes(q));
+  if(state.sort==='name') banks.sort((a,b)=>a.bank.localeCompare(b.bank));
+  else banks.sort((a,b)=> (b.current-a.current) || a.bank.localeCompare(b.bank));
+
+  rowsEl.innerHTML='';
+  banks.forEach((b,idx)=>{
+    const tr=document.createElement('tr');
+    if(isNelnet(b.bank)) tr.className='nelnet';
+    else if(b.stale) tr.className='stale';
+    const rank = state.sort==='name' ? '' : (idx+1);
+    let tags='';
+    if(isNelnet(b.bank)) tags+='<span class="tag you">Nelnet</span>';
+    if(b.stale) tags+=`<span class="tag stale">stale &middot; ${fmtDate(prod.dates[b.asof_idx])}</span>`;
+    tr.innerHTML=`
+      <td class="rank">${rank}</td>
+      <td><a class="bankname" href="${bankLink(b.bank, state.product)}" target="_blank" rel="noopener noreferrer" title="Open bank website">${b.bank}</a>${tags}</td>
+      <td class="r"><span class="apy">${b.current.toFixed(2)}<small> %</small></span></td>
+      <td class="r">${deltaCell(b.current,b.previous)}</td>
+      <td class="sp">${sparkline(b.series,ext)}</td>`;
+    rowsEl.appendChild(tr);
+  });
+
+  $('#count').textContent = `${banks.length} institution${banks.length!==1?'s':''} \u00b7 ${state.product}`;
+}
+
+/* ---- controls ---- */
+$('#search').addEventListener('input', e=>{ state.q=e.target.value; render(); });
+$('#sortRate').onclick=()=>{ state.sort='rate'; $('#sortRate').setAttribute('aria-pressed','true'); $('#sortName').setAttribute('aria-pressed','false'); render(); };
+$('#sortName').onclick=()=>{ state.sort='name'; $('#sortName').setAttribute('aria-pressed','true'); $('#sortRate').setAttribute('aria-pressed','false'); render(); };
+
+/* ---- earnings calculator ---- */
+const calcState = { product:null, bank:null, apyEdited:false };
+
+function parseMoney(s){ const n=parseFloat(String(s).replace(/[^0-9.]/g,'')); return isNaN(n)?0:n; }
+function fmtUSD(n){ return n.toLocaleString('en-US',{style:'currency',currency:'USD',minimumFractionDigits:0,maximumFractionDigits:0}); }
+function fmtMonths(m){
+  m=Math.round(m); if(m<=0) return '0 months';
+  const y=Math.floor(m/12), mo=m%12, parts=[];
+  if(y>0) parts.push(y+' year'+(y>1?'s':''));
+  if(mo>0) parts.push(mo+' month'+(mo>1?'s':''));
+  return parts.join(' and ');
+}
+
+function calcApyFromBank(){
+  const p=MODEL.products[calcState.product]; if(!p) return 0;
+  const b=p.banks.find(x=>x.bank===calcState.bank);
+  return b?b.current:0;
+}
+
+function buildCalcSelectors(){
+  const prodSel=$('#calcProduct'), bankSel=$('#calcBank');
+  const products=Object.keys(MODEL.products);
+  if(!calcState.product || !MODEL.products[calcState.product]) calcState.product=products[0];
+  prodSel.innerHTML=products.map(p=>`<option${p===calcState.product?' selected':''}>${p}</option>`).join('');
+  const banks=MODEL.products[calcState.product].banks.slice().sort((a,b)=>b.current-a.current);
+  if(!calcState.bank || !banks.some(b=>b.bank===calcState.bank)){
+    const nel=banks.find(b=>isNelnet(b.bank));
+    calcState.bank = nel ? nel.bank : (banks[0] && banks[0].bank);
+  }
+  bankSel.innerHTML=banks.map(b=>`<option value="${b.bank.replace(/"/g,'&quot;')}"${b.bank===calcState.bank?' selected':''}>${b.bank} — ${b.current.toFixed(2)}%</option>`).join('');
+}
+
+function matchTermYear(){
+  const p=calcState.product||'';
+  const m=p.match(/(\d+)\s*year/i);
+  if(m) return parseInt(m[1],10);
+  if(/12\s*month/i.test(p)) return 1;
+  return null;
+}
+
+function renderCalc(){
+  if(!MODEL.products[calcState.product]) return;
+  const principal=parseMoney($('#calcAmt').value);
+  const apy=parseMoney($('#calcApy').value)/100;
+  const termY=matchTermYear();           // null for HYSA
+  const customWrap=$('#calcCustomWrap');
+  let rows;
+  if(termY===null){
+    if(customWrap) customWrap.style.display='';
+    rows=[1,2,3].map(mo=>({label:`After ${fmtMonths(mo)}`, years:mo/12, match:false}));
+    const cm=Math.round(parseMoney($('#calcMonths').value));
+    if(cm>0) rows.push({label:`After ${fmtMonths(cm)}`, years:cm/12, match:true});
+  } else {
+    if(customWrap) customWrap.style.display='none';
+    rows=[];
+    for(let y=1;y<=termY;y++) rows.push({label:`After ${y} year${y>1?'s':''}`, years:y, match:(y===termY)});
+  }
+  const res=$('#calcResults');
+  res.innerHTML=rows.map(r=>{
+    const bal=principal*Math.pow(1+apy, r.years);
+    const intr=bal-principal;
+    const cls='cres'+(r.match?' match':'');
+    return `<div class="${cls}">
+      <span class="yr">${r.label}</span>
+      <span class="rt"><span class="bal">${fmtUSD(bal)}</span><span class="int">+${fmtUSD(intr)} interest</span></span>
+    </div>`;
+  }).join('');
+}
+
+function refreshCalc(resetApy){
+  buildCalcSelectors();
+  if(resetApy || !calcState.apyEdited){ $('#calcApy').value=calcApyFromBank().toFixed(2); calcState.apyEdited=false; }
+  renderCalc();
+}
+
+function initCalc(){
+  $('#calcProduct').addEventListener('change', e=>{ calcState.product=e.target.value; calcState.bank=null; refreshCalc(true); });
+  $('#calcBank').addEventListener('change', e=>{ calcState.bank=e.target.value; refreshCalc(true); });
+  $('#calcApy').addEventListener('input', ()=>{ calcState.apyEdited=true; renderCalc(); });
+  $('#calcAmt').addEventListener('input', renderCalc);
+  $('#calcMonths').addEventListener('input', renderCalc);
+  refreshCalc(true);
+}
+
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3200); }
+
+/* ---- excel re-parse (mirrors the build-time logic) ---- */
+function serialToISO(v){
+  if(typeof v==='number'){ const ms=Date.UTC(1899,11,30)+v*86400000; const d=new Date(ms); return d.toISOString().slice(0,10); }
+  const s=String(v).trim();
+  const m=s.match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{2,4})$/);
+  if(m){ let [_,mo,da,yr]=m; if(yr.length===2) yr='20'+yr; return `${yr}-${mo.padStart(2,'0')}-${da.padStart(2,'0')}`; }
+  return s;
+}
+function toPct(v){ if(v===''||v==null) return null; const n=Number(v); return isNaN(n)?null:Math.round(n*100*1000)/1000; }
+
+function parseWorkbook(wb){
+  const products={}; let asof='';
+  wb.SheetNames.forEach(name=>{
+    const ws=wb.Sheets[name];
+    const aoa=XLSX.utils.sheet_to_json(ws,{header:1, raw:true, defval:null});
+    if(!aoa.length) return;
+    const header=aoa[0];
+    const dates=[]; for(let c=1;c<header.length;c++){ if(header[c]!=null) dates.push(serialToISO(header[c])); }
+    const ndates=dates.length, lastIdx=ndates-1;
+    const banks=[];
+    for(let r=1;r<aoa.length;r++){
+      const row=aoa[r]; if(!row||row[0]==null||String(row[0]).trim()==='') continue;
+      const bank=String(row[0]).trim();
+      const series=[]; for(let c=1;c<=ndates;c++) series.push(toPct(row[c]==null?'':row[c]));
+      const nonnull=[]; series.forEach((v,i)=>{ if(v!=null) nonnull.push([i,v]); });
+      if(!nonnull.length) continue;
+      const [curi,cur]=nonnull[nonnull.length-1];
+      const prev=nonnull.length>=2?nonnull[nonnull.length-2][1]:null;
+      banks.push({bank, current:cur, previous:prev, asof_idx:curi, stale:curi!==lastIdx, series});
+    }
+    products[name]={dates, banks};
+    if(dates.length && dates[dates.length-1]>asof) asof=dates[dates.length-1];
+  });
+  return {asof, products};
+}
+
+/* ---- bootstrap ----
+   Render the data baked into this file first (works even opened from disk),
+   then load the committed rates.xlsx next to this page. On GitHub Pages that
+   fetch succeeds and the board shows whatever is in the repo workbook. Update
+   the live site by replacing rates.xlsx and committing. */
+render();
+initCalc();
+fetch('rates.xlsx', {cache:'no-store'})
+  .then(r => { if(!r.ok) throw new Error('no committed workbook'); return r.arrayBuffer(); })
+  .then(buf => {
+    const wb = XLSX.read(new Uint8Array(buf), {type:'array'});
+    const m = parseWorkbook(wb);
+    if(Object.keys(m.products).length){ MODEL = m; state.product = null; render(); refreshCalc(true); }
+  })
+  .catch(() => { /* opened locally or no rates.xlsx present — keep embedded data */ });
+</script>
+</body>
+</html>
